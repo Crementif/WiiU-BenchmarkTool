@@ -21,8 +21,18 @@ void (*MEMFreeToDefaultHeap)(void* addr);
 u64  (*OSGetTime)(void);
 void (*OSSleepTicks)(u64 ticks);
 
-// misc
+// coreinit misc
 int (*_snprintf)(char *buf, int n, const char *format, ... );
+
+// coreinit filesystem
+void (*FSInit)(void);
+int (*FSAddClient)(void *client, int flag);
+void (*FSInitCmdBlock)(void *block);
+int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
+
+// randgen
+unsigned int (*NSSGetRandom)(int min, int max);
+
 
 int __entry_menu(int argc, char **argv)
 {	
@@ -33,7 +43,10 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_Acquire = (int(*)(const char*, u32*))*(u32*)0x00801500;
 	OSDynLoad_FindExport = (int (*)(u32, int, const char *, void*))*(u32*)0x00801504;
 	u32 coreinitHandle;
+	u32 randgenHandle;
 	OSDynLoad_Acquire("coreinit", &coreinitHandle);
+	OSDynLoad_Acquire("randgen", &randgenHandle);
+	
 	// coreinit OSScreen
 	OSDynLoad_FindExport(coreinitHandle, 0, "OSScreenInit", (void*)&OSScreenInit);
 	OSDynLoad_FindExport(coreinitHandle, 0, "OSScreenGetBufferSizeEx", (void*)&OSScreenGetBufferSizeEx);
@@ -55,6 +68,14 @@ int __entry_menu(int argc, char **argv)
 	*(void**)&MEMFreeToDefaultHeap = *(void**)temp;
 	// coreinit misc
 	OSDynLoad_FindExport(coreinitHandle, 0, "__os_snprintf", (void*)&_snprintf);
+	// coreinit filesystem
+	OSDynLoad_FindExport(coreinitHandle, 0, "FSInit", (void*)&FSInit);
+	OSDynLoad_FindExport(coreinitHandle, 0, "FSAddClient", (void*)&FSAddClient);
+	OSDynLoad_FindExport(coreinitHandle, 0, "FSInitCmdBlock", (void*)&FSInitCmdBlock);
+	OSDynLoad_FindExport(coreinitHandle, 0, "SAVEOpenFile", (void*)&SAVEOpenFile);
+	
+	// randgen
+	OSDynLoad_FindExport(randgenHandle, 0, "NSSGetRandom", (void*)&NSSGetRandom);
 	
     int ret = mainFunc();
     return ret;

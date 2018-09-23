@@ -47,6 +47,15 @@ extern void (*OSSleepTicks)(u64 ticks);
 // coreinit misc
 extern int (*_snprintf)(char *buf, int n, const char *format, ... );
 
+// coreinit filesystem
+extern void (*FSInit)(void);
+extern int (*FSAddClient)(void *client, int flag);
+extern void (*FSInitCmdBlock)(void *block);
+extern int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
+
+// randgen
+extern unsigned int (*NSSGetRandom)(int min, int max);
+
 // drawing
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str);
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color);

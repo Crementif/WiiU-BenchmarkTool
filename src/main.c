@@ -5,6 +5,10 @@
 #define TEST_STATE_RUNNING		(1)
 #define TEST_STATE_COMPLETED	(2)
 #define TEST_STATE_FAILED		(3)
+#define TEST_STATE_SKIPPED		(4)
+
+// If set to a specific benchmark index, will only execute that one. Setting it to -1 will execute all benchmarks normally.
+#define DEBUG_BENCHMARK	(-1)
 
 typedef struct
 {
@@ -22,7 +26,7 @@ void drawStatusScreen()
 {
 	OSScreenClearBufferEx(0, 0);
 	OSScreenClearBufferEx(1, 0);
-	drawText(-1, 1, 1, 0xFF905000, "Wii U CPU benchmark tool v0.1 (single-core)");
+	drawText(-1, 1, 1, 0xFF905000, "Wii U CPU benchmark tool v0.2 (single-core)");
 	drawText(-1, 1, 3, 0xFFFFFFFF, "Status      Duration    Test-Name");
 	drawHorizontalLineW2(-1, 1, 4, 50, 0xFFFFFFFF);
 	char text[128];
@@ -52,6 +56,10 @@ void drawStatusScreen()
 			allComplete = 0;
 			drawText(-1, 1, 5+i, 0x80808000, "QUEUED");
 		}
+		else if( testResultList[i].state == TEST_STATE_SKIPPED )
+		{
+			drawText(-1, 1, 5+i, 0x80FF8000, "SKIPPED");
+		}
 		else
 		{
 			allComplete = 0;
@@ -77,12 +85,12 @@ void drawResult()
 
 void queueTest(int(*testFunc)(), char* name)
 {
-	sint32 testIndex = 	testResultCount;
+	sint32 testIndex = testResultCount;
 	testResultList[testIndex].name = name;
 	testResultList[testIndex].testFunc = testFunc;
 	testResultList[testIndex].tickStart = 0;
-	testResultList[testIndex].tickEnd = 0;	
-	testResultList[testIndex].state = TEST_STATE_QUEUED;	
+	testResultList[testIndex].tickEnd = 0;
+	testResultList[testIndex].state = TEST_STATE_QUEUED;
 	testResultCount++;
 }
 
@@ -91,11 +99,12 @@ void runTest(int testIndex)
 	testResultList[testIndex].state = TEST_STATE_RUNNING;
 	drawStatusScreen();
 	uint64 tickStart = OSGetTime();
-	testResultList[testIndex].testFunc();
+	if( DEBUG_BENCHMARK == -1 || DEBUG_BENCHMARK == testIndex ) testResultList[testIndex].testFunc();
 	uint64 tickEnd = OSGetTime();
 	testResultList[testIndex].tickStart = tickStart;
-	testResultList[testIndex].tickEnd = tickEnd;	
-	testResultList[testIndex].state = TEST_STATE_COMPLETED;	
+	testResultList[testIndex].tickEnd = tickEnd;
+	if( DEBUG_BENCHMARK == -1 || DEBUG_BENCHMARK == testIndex ) testResultList[testIndex].state = TEST_STATE_COMPLETED;
+	else testResultList[testIndex].state = TEST_STATE_SKIPPED;
 	drawStatusScreen();
 }
 
@@ -116,6 +125,7 @@ int mainFunc(void)
 	queueTest(test2_run, "AES128"); // AES128 compression
 	queueTest(test3_run, "COPY"); // memory copy
 	queueTest(test4_run, "RECUR"); // recursive functions
+	queueTest(test5_run, "STORAGE"); // store and read a 20mb file
 	
 	// run tests
 	for(sint32 i=0; i<testResultCount; i++)
