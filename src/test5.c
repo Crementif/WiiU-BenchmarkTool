@@ -1,5 +1,4 @@
 #include "main.h"
-#include <stdlib.h>
 
 // This program writes a 20mb buffer to the hard-disk to test performance.
 #define BUFFER_SIZE						20000000
@@ -25,22 +24,22 @@ int test5_run()
 {
 	void* fsClient = memAlloc(FS_CLIENT_SIZE);
 	void* fsCmd = memAlloc(FS_CMD_BLOCK_SIZE);
-	unsigned char* fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 32);
+	unsigned char* fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 64);
 	int fsHandle = -1;
 	
-	
 	FSInit();
-	SAVEInit();
-	SAVEInitSaveDir(0);
+	FSAddClient(fsClient, -1);
 	FSInitCmdBlock(fsCmd);
-	int saveStatus = SAVEOpenFile(fsClient, fsCmd, "test5_benchmark.bin", "r+", &fsHandle, -1);
 	
-	char buffer[256];
-	itoa(saveStatus, buffer, 10);
-	setDebugMessage(buffer);
+	SAVEInit();
+	SAVEInitSaveDir(0xFF);
+	int saveStatus = SAVEOpenFile(fsClient, fsCmd, 0xFF, "write_benchmark.bin", "w+", &fsHandle, -1);
+	
 	randState = OSGetTime();
 	
-	int writeStatus = FSWriteFile(fsClient, fsCmd, fsBuffer, 160, 0x01, fsHandle, 0, -1);
+	setDebugMessageInt(randInt());
+	
+	int writeStatus = FSWriteFile(fsClient, fsCmd, fsBuffer, BUFFER_SIZE, 1, fsHandle, 0, -1);
 	
 	return 0;
 }

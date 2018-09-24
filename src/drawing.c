@@ -1,5 +1,6 @@
 #include "main.h"
 #include <string.h>
+#include <stdlib.h>
 
 const uint8 font8x15[] = 
 {
@@ -1699,4 +1700,11 @@ void setDebugMessage(char str[256])
 {
 	memset(debugMessage, 0, 256);
 	strcpy(debugMessage, str);
+}
+
+void setDebugMessageInt(int number)
+{
+	char buffer[256];
+	itoa(number, buffer, 10);
+	setDebugMessage(buffer);
 }

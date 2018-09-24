@@ -32,8 +32,8 @@ int (*FSWriteFile)(void *client, void *block, const void *source, int blockSize,
 
 // nn_save
 void (*SAVEInit)(void);
-void (*SAVEInitSaveDir)(int something);
-int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
+void (*SAVEInitSaveDir)(unsigned char accountSlot);
+int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot, const char *path, const char *mode, int *fileHandle, int errHandling);
 
 
 int __entry_menu(int argc, char **argv)

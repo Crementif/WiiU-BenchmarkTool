@@ -126,7 +126,7 @@ int mainFunc(void)
 	queueTest(test2_run, "AES128"); // AES128 compression
 	queueTest(test3_run, "COPY"); // memory copy
 	queueTest(test4_run, "RECUR"); // recursive functions
-	queueTest(test5_run, "STORAGE"); // store and read a 20mb file
+	queueTest(test5_run, "WRITE"); // write 20mb file
 	
 	// run tests
 	for(sint32 i=0; i<testResultCount; i++)

@@ -56,12 +56,13 @@ extern int (*FSWriteFile)(void *client, void *block, const void *source, int blo
 
 // nn_save
 extern void (*SAVEInit)(void);
-extern void (*SAVEInitSaveDir)(int something);
-extern int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
+extern void (*SAVEInitSaveDir)(unsigned char accountSlot);
+extern int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot, const char *path, const char *mode, int *fileHandle, int errHandling);
 
 
 // drawing
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str);
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color);
 void setDebugMessage(char* str);
+void setDebugMessageInt(int number);
 extern char debugMessage[256];
