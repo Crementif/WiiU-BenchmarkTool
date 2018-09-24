@@ -28,10 +28,12 @@ int (*_snprintf)(char *buf, int n, const char *format, ... );
 void (*FSInit)(void);
 int (*FSAddClient)(void *client, int flag);
 void (*FSInitCmdBlock)(void *block);
-int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
+int (*FSWriteFile)(void *client, void *block, const void *source, int blockSize, int blockCount, int fileHandle, int flag, int error);
 
-// randgen
-unsigned int (*NSSGetRandom)(int min, int max);
+// nn_save
+void (*SAVEInit)(void);
+void (*SAVEInitSaveDir)(int something);
+int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
 
 
 int __entry_menu(int argc, char **argv)
@@ -43,9 +45,10 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_Acquire = (int(*)(const char*, u32*))*(u32*)0x00801500;
 	OSDynLoad_FindExport = (int (*)(u32, int, const char *, void*))*(u32*)0x00801504;
 	u32 coreinitHandle;
-	u32 randgenHandle;
+	u32 nn_saveHandle;
 	OSDynLoad_Acquire("coreinit", &coreinitHandle);
-	OSDynLoad_Acquire("randgen", &randgenHandle);
+	OSDynLoad_Acquire("nn_save", &nn_saveHandle);
+	
 	
 	// coreinit OSScreen
 	OSDynLoad_FindExport(coreinitHandle, 0, "OSScreenInit", (void*)&OSScreenInit);
@@ -72,10 +75,13 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_FindExport(coreinitHandle, 0, "FSInit", (void*)&FSInit);
 	OSDynLoad_FindExport(coreinitHandle, 0, "FSAddClient", (void*)&FSAddClient);
 	OSDynLoad_FindExport(coreinitHandle, 0, "FSInitCmdBlock", (void*)&FSInitCmdBlock);
-	OSDynLoad_FindExport(coreinitHandle, 0, "SAVEOpenFile", (void*)&SAVEOpenFile);
+	OSDynLoad_FindExport(coreinitHandle, 0, "FSWriteFile", (void*)&FSWriteFile);
 	
-	// randgen
-	OSDynLoad_FindExport(randgenHandle, 0, "NSSGetRandom", (void*)&NSSGetRandom);
+	// nn_save
+	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEOpenFile", (void*)&SAVEOpenFile);
+	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEInit", (void*)&SAVEInit);
+	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEInitSaveDir", (void*)&SAVEInitSaveDir);
+	
 	
     int ret = mainFunc();
     return ret;
@@ -86,7 +92,14 @@ void* memAlloc(int size)
 	return MEMAllocFromDefaultHeapEx(size, 16);
 }
 
+void* memAllocEx(int size, int alignment)
+{
+    return MEMAllocFromDefaultHeapEx(size, alignment);
+}
+
 void memFree(void* ptr)
 {
 	MEMFreeToDefaultHeap(ptr);
 }
+
+char debugMessage[256];

@@ -10,6 +10,7 @@ typedef unsigned char uint8;
 typedef signed char sint8;
 
 void* memAlloc(int size);
+void* memAllocEx(int size, int alignment);
 void memFree(void* ptr);
 
 int mainFunc(void);
@@ -51,11 +52,16 @@ extern int (*_snprintf)(char *buf, int n, const char *format, ... );
 extern void (*FSInit)(void);
 extern int (*FSAddClient)(void *client, int flag);
 extern void (*FSInitCmdBlock)(void *block);
+extern int (*FSWriteFile)(void *client, void *block, const void *source, int blockSize, int blockCount, int fileHandle, int flag, int error);
+
+// nn_save
+extern void (*SAVEInit)(void);
+extern void (*SAVEInitSaveDir)(int something);
 extern int (*SAVEOpenFile)(void *client, void *block, const char *path, const char *mode, int *fileHandle, int errHandling);
 
-// randgen
-extern unsigned int (*NSSGetRandom)(int min, int max);
 
 // drawing
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str);
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color);
+void setDebugMessage(char* str);
+extern char debugMessage[256];

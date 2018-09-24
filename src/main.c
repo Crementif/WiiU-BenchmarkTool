@@ -74,6 +74,7 @@ void drawStatusScreen()
 		_snprintf(text, sizeof(text), "Total: %dms", totalTime);
 		drawText(-1, 1, 5+testResultCount+2, 0xFFFFFFFF, text);
 	}
+	drawText(-1, 1, 5+testResultCount+4, 0xFFFFFFFF, debugMessage);
 	OSScreenFlipBuffersEx(0);
 	OSScreenFlipBuffersEx(1);
 }

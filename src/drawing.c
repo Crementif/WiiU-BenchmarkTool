@@ -1,4 +1,5 @@
 #include "main.h"
+#include <string.h>
 
 const uint8 font8x15[] = 
 {
@@ -1691,4 +1692,11 @@ void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, ui
 		plotFontPixel(bufferNum, px + fx, py + 6, color);
 		plotFontPixel(bufferNum, px + fx, py + 7, color);
 	}
+}
+
+// change debug line
+void setDebugMessage(char str[256])
+{
+	memset(debugMessage, 0, 256);
+	strcpy(debugMessage, str);
 }
