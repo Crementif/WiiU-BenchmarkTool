@@ -16,8 +16,6 @@ uint64 randInt()
 
 int test5_run()
 {
-	unsigned char* fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 64);
-	ptr_fsBuffer = (long)fsBuffer;
 	randState = OSGetTime();
 	uint64 newAddition;
 	for (int i=0; i<BUFFER_SIZE;)

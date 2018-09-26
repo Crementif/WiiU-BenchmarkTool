@@ -12,7 +12,6 @@
 
 int test6_run()
 {
-	unsigned char* fsBuffer = (unsigned char*)ptr_fsBuffer;
 	void* fsClient = memAlloc(FS_CLIENT_SIZE);
 	void* fsCmd = memAlloc(FS_CMD_BLOCK_SIZE);
 	int fsHandle = -1;

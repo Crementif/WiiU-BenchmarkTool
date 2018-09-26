@@ -70,5 +70,5 @@ extern char debugMessage[256];
 
 // buffer size for random and write test
 #define BUFFER_SIZE						20000000
-extern long ptr_fsBuffer;
+extern unsigned char* fsBuffer;
 

@@ -126,6 +126,8 @@ int mainFunc(void)
 	
 	drawStatusScreen();
 	
+	fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 64);
+	
 	queueTest(test1_run, "ALU"); // arithmetic in a loop
 	queueTest(test2_run, "AES128"); // AES128 compression
 	queueTest(test3_run, "COPY"); // memory copy
@@ -145,3 +147,5 @@ int mainFunc(void)
 	}
 	return 0;
 }
+
+unsigned char* fsBuffer = 0;
