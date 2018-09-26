@@ -26,7 +26,7 @@ void drawStatusScreen()
 {
 	OSScreenClearBufferEx(0, 0);
 	OSScreenClearBufferEx(1, 0);
-	drawText(-1, 1, 1, 0xFF905000, "Wii U CPU benchmark tool v0.2 (single-core)");
+	drawText(-1, 1, 1, 0xFF905000, "Wii U benchmark tool v0.3 (single-core)");
 	drawText(-1, 1, 3, 0xFFFFFFFF, "Status      Duration    Test-Name");
 	drawHorizontalLineW2(-1, 1, 4, 50, 0xFFFFFFFF);
 	char text[128];
@@ -134,6 +134,7 @@ int mainFunc(void)
 	queueTest(test4_run, "RECUR"); // recursive functions
 	queueTest(test5_run, "RANDGEN"); // fills 20mb buffer with random numbers
 	queueTest(test6_run, "WRITE"); // write 20mb file
+	queueTest(test7_run, "POINTER CHASING"); // create and chase a pointer array
 	
 	// run tests
 	for(sint32 i=0; i<testResultCount; i++)

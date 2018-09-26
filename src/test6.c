@@ -26,5 +26,9 @@ int test6_run()
 	
 	FSWriteFile(fsClient, fsCmd, fsBuffer, BUFFER_SIZE, 1, fsHandle, 0, -1);
 	
+	memFree(fsBuffer);
+	memFree(fsClient);
+	memFree(fsCmd);
+	
 	return 0;
 }

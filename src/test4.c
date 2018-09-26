@@ -30,5 +30,6 @@ int test4_run()
 		v += t4_recursiveC(0, 0x11111111 + i * 133, 0xFFFFFFFF - i * 1021);
 
 	test2Result = v;
+	
 	return 0;
 }

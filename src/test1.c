@@ -40,5 +40,6 @@ int test1_run()
 		v15 = v15 + v0;
 	}
 	test1Result = v0;
+	
 	return 0;
 }
