@@ -1,12 +1,7 @@
 #include "main.h"
+#include <stdlib.h>
 
-// This program writes a 20mb buffer to the hard-disk to test performance.
-#define BUFFER_SIZE						20000000
-
-#define FS_CLIENT_SIZE                  0x1700
-#define FS_CMD_BLOCK_SIZE               0xA80
-
-#define FS_STATUS_OK					0
+// This test fills a buffer with random numbers, size determined by BUFFER_SIZE in main.h
 
 
 // Implement Xorshift RNG
@@ -19,27 +14,20 @@ uint64 randInt()
 	return randState;
 }
 
-
 int test5_run()
 {
-	void* fsClient = memAlloc(FS_CLIENT_SIZE);
-	void* fsCmd = memAlloc(FS_CMD_BLOCK_SIZE);
 	unsigned char* fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 64);
-	int fsHandle = -1;
-	
-	FSInit();
-	FSAddClient(fsClient, -1);
-	FSInitCmdBlock(fsCmd);
-	
-	SAVEInit();
-	SAVEInitSaveDir(0xFF);
-	int saveStatus = SAVEOpenFile(fsClient, fsCmd, 0xFF, "write_benchmark.bin", "w+", &fsHandle, -1);
-	
+	ptr_fsBuffer = (long)fsBuffer;
 	randState = OSGetTime();
-	
-	setDebugMessageInt(randInt());
-	
-	int writeStatus = FSWriteFile(fsClient, fsCmd, fsBuffer, BUFFER_SIZE, 1, fsHandle, 0, -1);
+	uint64 newAddition;
+	for (int i=0; i<BUFFER_SIZE;)
+	{
+		newAddition = randInt();
+		char randBuffer[20];
+		itoa(newAddition, randBuffer, 10);
+		memcpy(&fsBuffer[i], randBuffer, strlen(randBuffer));
+		i+=strlen(randBuffer);
+	}
 	
 	return 0;
 }

@@ -63,7 +63,7 @@ void drawStatusScreen()
 		else
 		{
 			allComplete = 0;
-			drawText(-1, 1, 5+i, 0x8080FFFF, "RUNNING");
+			drawText(-1, 1, 5+i, 0x8080FF00, "RUNNING");
 		}
 		_snprintf(text, sizeof(text), "%-11s %-11s", durationText, testResultList[i].name);
 		drawText(-1, 1+12, 5+i, 0xFFFFFFFF, text);
@@ -74,7 +74,11 @@ void drawStatusScreen()
 		_snprintf(text, sizeof(text), "Total: %dms", totalTime);
 		drawText(-1, 1, 5+testResultCount+2, 0xFFFFFFFF, text);
 	}
-	drawText(-1, 1, 5+testResultCount+4, 0xFFFFFFFF, debugMessage);
+	if( strlen(debugMessage) != 0 )
+	{
+		drawText(-1, 1, 5+testResultCount+5, 0xFF505000, "Debug Message:");
+		drawText(-1, 1, 5+testResultCount+6, 0xFF505000, debugMessage);
+	}
 	OSScreenFlipBuffersEx(0);
 	OSScreenFlipBuffersEx(1);
 }
@@ -126,7 +130,8 @@ int mainFunc(void)
 	queueTest(test2_run, "AES128"); // AES128 compression
 	queueTest(test3_run, "COPY"); // memory copy
 	queueTest(test4_run, "RECUR"); // recursive functions
-	queueTest(test5_run, "WRITE"); // write 20mb file
+	queueTest(test5_run, "RANDGEN"); // fills 20mb buffer with random numbers
+	queueTest(test6_run, "WRITE"); // write 20mb file
 	
 	// run tests
 	for(sint32 i=0; i<testResultCount; i++)
@@ -140,4 +145,3 @@ int mainFunc(void)
 	}
 	return 0;
 }
-

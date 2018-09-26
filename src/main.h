@@ -1,4 +1,5 @@
 #include <gctypes.h>
+#include <string.h>
 
 typedef unsigned long long uint64;
 typedef signed long long sint64;
@@ -66,3 +67,8 @@ void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, ui
 void setDebugMessage(char* str);
 void setDebugMessageInt(int number);
 extern char debugMessage[256];
+
+// buffer size for random and write test
+#define BUFFER_SIZE						20000000
+extern long ptr_fsBuffer;
+

@@ -103,3 +103,5 @@ void memFree(void* ptr)
 }
 
 char debugMessage[256];
+
+long ptr_fsBuffer = -1;
