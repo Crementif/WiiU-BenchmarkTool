@@ -31,7 +31,7 @@ extern int (*OSDynLoad_FindExport)(u32 handle, int isdata, const char *symbol, v
 extern void (*OSScreenInit)(void);
 extern unsigned int (*OSScreenGetBufferSizeEx)(unsigned int bufferNum);
 extern int (*OSScreenSetBufferEx)(unsigned int bufferNum, void * addr);
-extern int (*OSScreenClearBufferEx)(unsigned int bufferNum, unsigned int temp);
+extern int (*OSScreenClearBufferEx)(unsigned int bufferNum, uint32 color);
 extern int (*OSScreenFlipBuffersEx)(unsigned int bufferNum);
 extern int (*OSScreenPutFontEx)(unsigned int bufferNum, unsigned int posX, unsigned int posY, const char * buffer);
 extern void (*OSScreenPutPixelEx)(int bufferNum, uint32 posX, uint32 posY, uint32 color);
@@ -63,12 +63,21 @@ extern int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot,
 
 // drawing
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str);
+void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, bool clearPixels, int scalar, int depth);
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color);
+void drawHorizontalLineW2Ex(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color, int scalar, int depth);
 void setDebugMessage(char* str);
 void setDebugMessageInt(int number);
 extern char debugMessage[256];
 
+
+// vpad
+extern void (*VPADBASEInit)(void);
+extern int (*VPADRead)(int padnum, void/*VPADData*/ *buffer, int num_datasets, int *err);
+
+
+
 // buffer size for random and write test
-#define BUFFER_SIZE						20000000
+#define BUFFER_SIZE 20000000
 extern unsigned char* fsBuffer;
 

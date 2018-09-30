@@ -1,5 +1,6 @@
 #include "main.h"
 #include "benchmarkTests.h"
+#include "game/game.c"
 
 #define TEST_STATE_QUEUED		(0)
 #define TEST_STATE_RUNNING		(1)
@@ -21,6 +22,7 @@ typedef struct
 
 testResultState_t testResultList[32];
 sint32 testResultCount = 0;
+int allComplete = 0;
 
 void drawStatusScreen()
 {
@@ -30,7 +32,7 @@ void drawStatusScreen()
 	drawText(-1, 1, 3, 0xFFFFFFFF, "Status      Duration    Test-Name");
 	drawHorizontalLineW2(-1, 1, 4, 50, 0xFFFFFFFF);
 	char text[128];
-	int allComplete = 1;
+	allComplete = 1;
 	sint32 totalTime = 0;
 	for(sint32 i=0; i<testResultCount; i++)
 	{
@@ -127,6 +129,8 @@ int mainFunc(void)
 	drawStatusScreen();
 	
 	fsBuffer = (unsigned char*)memAllocEx(BUFFER_SIZE, 64);
+	int vpadError;
+	VPADData vpadData;
 	
 	queueTest(test1_run, "ALU"); // arithmetic in a loop
 	queueTest(test2_run, "AES128"); // AES128 compression
@@ -141,11 +145,13 @@ int mainFunc(void)
 	{
 		runTest(i);
 	}
-	while( 1 )
+	while(!(vpadData.buttonTrigger&VPAD_BUTTON_A))
 	{
+		VPADRead(0, &vpadData, 1, &vpadError);
 		drawResult();
 		OSSleepTicks(MILLISECS_TO_TICKS(1000/30)); // aim for roughly 30 FPS
 	}
+	run_game(false);
 	return 0;
 }
 

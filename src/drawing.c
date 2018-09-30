@@ -1619,17 +1619,24 @@ sint32 _getGetFontCharIndex(char c)
 	return -1;
 }
 
-void plotFontPixel(sint32 bufferNum, sint32 px, sint32 py, uint32 color)
+void plotFontPixel(sint32 bufferNum, sint32 px, sint32 py, uint32 color, int depth)
 {
-	OSScreenPutPixelEx(bufferNum, px, py, color);
+	for (int i=0; i<depth; i++) {
+		OSScreenPutPixelEx(bufferNum, px+i, py+i, color);
+	}
 }
+
 
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str)
 {
+	drawTextEx(bufferNum, x, y, color, str, true, 1, 1);
+}
+
+void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, bool clearPixels, int scalar, int depth) {
 	if( bufferNum < 0 )
 	{
-		drawText(0, x, y, color, str);
-		drawText(1, x, y, color, str);
+		drawTextEx(0, x, y, color, str, clearPixels, scalar, depth);
+		drawTextEx(1, x, y, color, str, clearPixels, scalar, depth);
 		return;
 	}
 	sint32 px = x * 8;
@@ -1640,23 +1647,21 @@ void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str)
 		sint32 charIndex = _getGetFontCharIndex(*str);
 		if (charIndex >= 0)
 		{
-			// clear area
-			for (sint32 fy = 0; fy < 16; fy++)
-			{
-				for (sint32 fx = 0; fx < 8; fx++)
+			if (clearPixels) {
+				// clear area
+				for (sint32 fy = 0; fy < 16; fy++)
 				{
-					plotFontPixel(bufferNum, px + fx, py + fy, 0);
+					for (sint32 fx = 0; fx < 8; fx++)
+					{
+						plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
+					}
 				}
 			}
 			// plot font pixels
 			const uint8* charBitmap = font8x15 + charIndex * (1 * 15);
-			for (sint32 fy = 0; fy < 15; fy++)
-			{
-				for (sint32 fx = 0; fx < 8; fx++)
-				{
-					if(((charBitmap[(fx/8)+(fy)*1]>>(7-(fx&7)))&1) == 0)
-						continue;
-					plotFontPixel(bufferNum, px + fx, py + fy, color);
+			for (sint32 fy=0; fy<15*scalar; fy++) {
+				for (sint32 fx=0; fx<8; fx++) {
+					if (charBitmap[fy/scalar] & 1 << fx) plotFontPixel(bufferNum, px-fx, py+fy, color, depth);
 				}
 			}
 		}
@@ -1666,23 +1671,27 @@ void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str)
 			{
 				for (sint32 fx = 0; fx < 8; fx++)
 				{
-					plotFontPixel(bufferNum, px + fx, py + fy, 0);
+					plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
 				}
 			}
 		}
 		px += 8;
 		str++;
 	}
-	
 }
 
 // draw horizontal line with width 2
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color)
 {
+	drawHorizontalLineW2Ex(0, x, y, width, color, 1, 1);
+}
+
+void drawHorizontalLineW2Ex(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color, int scalar, int depth)
+{
 	if( bufferNum < 0 )
 	{
-		drawHorizontalLineW2(0, x, y, width, color);
-		drawHorizontalLineW2(1, x, y, width, color);
+		drawHorizontalLineW2Ex(0, x, y, width, color, scalar, depth);
+		drawHorizontalLineW2Ex(1, x, y, width, color, scalar, depth);
 		return;
 	}
 	sint32 px = x * 8;
@@ -1690,8 +1699,8 @@ void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, ui
 	
 	for(sint32 fx=0; fx<width*8; fx++)
 	{
-		plotFontPixel(bufferNum, px + fx, py + 6, color);
-		plotFontPixel(bufferNum, px + fx, py + 7, color);
+		plotFontPixel(bufferNum, px + fx, py + 6, color, depth);
+		plotFontPixel(bufferNum, px + fx, py + 7, color, depth);
 	}
 }
 

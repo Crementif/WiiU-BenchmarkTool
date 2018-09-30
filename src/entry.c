@@ -35,6 +35,10 @@ void (*SAVEInit)(void);
 void (*SAVEInitSaveDir)(unsigned char accountSlot);
 int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot, const char *path, const char *mode, int *fileHandle, int errHandling);
 
+// vpad
+void (*VPADBASEInit)(void);
+int (*VPADRead)(int padnum, void/*VPADData*/ *buffer, int num_datasets, int *err);
+
 
 int __entry_menu(int argc, char **argv)
 {	
@@ -46,8 +50,10 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_FindExport = (int (*)(u32, int, const char *, void*))*(u32*)0x00801504;
 	u32 coreinitHandle;
 	u32 nn_saveHandle;
+	u32 vpadHandle;
 	OSDynLoad_Acquire("coreinit", &coreinitHandle);
 	OSDynLoad_Acquire("nn_save", &nn_saveHandle);
+	OSDynLoad_Acquire("vpad", &vpadHandle);
 	
 	
 	// coreinit OSScreen
@@ -81,6 +87,11 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEOpenFile", (void*)&SAVEOpenFile);
 	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEInit", (void*)&SAVEInit);
 	OSDynLoad_FindExport(nn_saveHandle, 0, "SAVEInitSaveDir", (void*)&SAVEInitSaveDir);
+	
+	// vpad
+	OSDynLoad_FindExport(vpadHandle, 0, "VPADBASEInit", (void*)&VPADBASEInit);
+	OSDynLoad_FindExport(vpadHandle, 0, "VPADRead", (void*)&VPADRead);
+	VPADBASEInit();
 	
 	
     int ret = mainFunc();
