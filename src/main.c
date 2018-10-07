@@ -156,3 +156,12 @@ int mainFunc(void)
 }
 
 unsigned char* fsBuffer = 0;
+
+// Implement Xorshift RNG
+uint64 randInt(uint64 seed)
+{
+	seed ^= seed << 13;
+	seed ^= seed >> 17;
+	seed ^= seed << 5;
+	return seed;
+}
