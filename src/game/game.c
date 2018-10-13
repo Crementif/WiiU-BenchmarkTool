@@ -1,4 +1,3 @@
-#include "main.h"
 #include "game.h"
 #include "vpad.h"
 #include "rendering.h"
@@ -32,8 +31,6 @@ void drawMenu() {
 	
 	if (vpadData.buttonTrigger&VPAD_BUTTON_A) {
 		gameState = MAIN_MENU+1+selectedOption;
-		//struct levelStage currStage {};
-		//OSGetTime();
 		transition = 0;
 		selectedOption = 0;
 		return;
@@ -71,7 +68,7 @@ void drawGame() {
 	if (gameCountdown == 1*(1000/aimFPS)) drawTextEx(-1, 72, 3, 0xFF905000, "1", true, 2, 1);
 	if (gameCountdown == 0*(1000/aimFPS)) drawTextEx(-1, 72, 3, 0xFF905000, "GO", true, 2, 1);
 	if (gameCountdown >= 0*(1000/aimFPS)) gameCountdown--;
-	//renderLevel(levelSeed);
+	renderLevel(levelSeed);
 }
 
 

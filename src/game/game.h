@@ -1,7 +1,10 @@
 #include <gctypes.h>
 
-// Defines how many blocks we'll generate.
+// Some values for the level generation.
 #define LEVEL_SIZE (200)
+
+#define STAGE_HEIGHT (9)
+#define STAGE_WIDTH (16)
 
 // Game States
 #define INTRO (0)
@@ -21,7 +24,7 @@ int gameCountdown = 0;
 int gameScore = 0;
 
 int buttonCooldown = 0; // Used for menu navigating
-int aimFPS = 30;
+int aimFPS = 60;
 
 // Color Palette
 #define OPTION_SELECTED 0xFCFCFC00
@@ -31,12 +34,5 @@ int selectedOption = 0;
 void run_game(bool debugMode);
 
 // Game
-struct levelBlock {
-	uint32 type;
-	uint32 parameters;
-};
-struct levelStage {
-	uint64 generationSeed;
-	uint64 depth;
-	struct levelBlock levelBlock[LEVEL_SIZE];
-};
+uint64 levelSeed = 0;
+int levelStage[STAGE_HEIGHT][STAGE_WIDTH];
