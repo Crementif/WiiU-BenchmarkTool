@@ -2,12 +2,18 @@
 #include "vpad.h"
 #include "rendering.h"
 
-
 int vpadError;
 VPADData vpadData;
 
 // menu screens
 void drawIntro(bool debugMode) {
+	OSScreenClearBufferEx(0, 0);
+	OSScreenClearBufferEx(1, 0);
+	renderLevel(100);
+	OSScreenFlipBuffersEx(0);
+	OSScreenFlipBuffersEx(1);
+	OSSleepTicks(MILLISECS_TO_TICKS(1000000/aimFPS));
+	
 	// create transition
 	transition++;
 	if (transition<1.4*aimFPS) drawTextEx(-1, 65, 20, 0xF4424200, "Powered by the Trash bites! engine", true, 4, 1.4*aimFPS-(transition));
