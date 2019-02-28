@@ -10,6 +10,7 @@ VPADData vpadData;
 void drawIntro(bool debugMode) {
 	// create transition
 	transition++;
+	levelSeed = 1;
 	if (transition<1.4*aimFPS) drawTextEx(-1, 65, 20, 0xF4424200, "Powered by the Trash bites! engine", true, 4, 1.4*aimFPS-(transition));
 	if (transition>=1.4*aimFPS) drawTextEx(-1, 65, 20, 0xF4424200, "Powered by the Trash bites! engine", true, 4, 1);
 	if (transition>4*aimFPS || debugMode) {
@@ -42,8 +43,9 @@ void drawMenu() {
 
 void drawOptionMenu() {
 	// TODO: Implement actual settings
-	drawTextEx(-1, 72, 20, 0xFF905000, "FPS 60", true, 2, 1);
+	drawTextEx(-1, 72, 20, 0xFF905000, "FPS - 60", true, 2, 1);
 	drawTextEx(-1, 72, 22, 0xFF905000, "4K textures", true, 2, 1);
+	drawTextEx(-1, 72, 24, 0xFF905000, "Speed - 2", true, 2, 1);
 	if (vpadData.buttonTrigger&VPAD_BUTTON_UP || vpadData.buttonTrigger&VPAD_BUTTON_DOWN) {
 		selectedOption = !selectedOption;
 	}
@@ -68,12 +70,13 @@ void drawGame() {
 	if (gameCountdown == 1*(1000/aimFPS)) drawTextEx(-1, 72, 3, 0xFF905000, "1", true, 2, 1);
 	if (gameCountdown == 0*(1000/aimFPS)) drawTextEx(-1, 72, 3, 0xFF905000, "GO", true, 2, 1);
 	if (gameCountdown >= 0*(1000/aimFPS)) gameCountdown--;
-	renderLevel(levelSeed);
+	renderLevel(runSpeed);
 }
 
 
 void run_game(bool debugMode)
 {
+	initializeLevelGrid();
 	while(true) {
 		OSScreenClearBufferEx(0, 0);
 		OSScreenClearBufferEx(1, 0);

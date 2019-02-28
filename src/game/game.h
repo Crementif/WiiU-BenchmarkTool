@@ -3,9 +3,6 @@
 // Some values for the level generation.
 #define LEVEL_SIZE (200)
 
-#define STAGE_HEIGHT (9)
-#define STAGE_WIDTH (16)
-
 // Game States
 #define INTRO (0)
 #define MAIN_MENU (1)
@@ -21,7 +18,7 @@ int highScore = 0;
 int infection = 0;
 
 int gameCountdown = 0;
-int gameScore = 0;
+int runSpeed = 8.5;
 
 int buttonCooldown = 0; // Used for menu navigating
 int aimFPS = 60;
@@ -32,7 +29,3 @@ int aimFPS = 60;
 
 int selectedOption = 0;
 void run_game(bool debugMode);
-
-// Game
-uint64 levelSeed = 0;
-int levelStage[STAGE_HEIGHT][STAGE_WIDTH];
