@@ -75,9 +75,22 @@ extern char debugMessage[256];
 extern void (*VPADBASEInit)(void);
 extern int (*VPADRead)(int padnum, void/*VPADData*/ *buffer, int num_datasets, int *err);
 
+// nsysnet
+extern void (*socket_lib_init)(void);
+extern int (*socket)(int domain, int type, int protocol);
+extern int (*socketclose)(int s);
+extern int (*connect)(int s, void *addr, int addrlen);
+extern int (*bind)(s32 s, void *name, s32 namelen);
+extern int (*listen)(s32 s, u32 backlog);
+extern int (*accept)(s32 s, void *addr, s32 *addrlen);
+extern int (*send)(int s, const void *buffer, int size, int flags);
+extern int (*recv)(int s, void *buffer, int size, int flags);
+extern int (*sendto)(int s, const void *buffer, int size, int flags, const void *dest, int dest_len);
+extern int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);
 
+extern int (*inet_aton)(const char *cp, void *inp);
+extern int (*socketlasterr)(void);
 
 // buffer size for random and write test
 #define BUFFER_SIZE 20000000
 extern unsigned char* fsBuffer;
-

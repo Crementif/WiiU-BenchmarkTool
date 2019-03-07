@@ -6,19 +6,19 @@
 // Game States
 #define INTRO (0)
 #define MAIN_MENU (1)
-#define GAMEPLAY (2)
-#define OPTION_MENU (3)
-#define GAME_OVER (4)
+#define GAMEPLAY_CLIENT (2)
+#define GAMEPLAY_HOST (3)
+#define OPTION_MENU (4)
+#define GAME_OVER (5)
 
 int gameState = INTRO;
 int transition = 0;
 
-
 int highScore = 0;
 int infection = 0;
 
-int gameCountdown = 0;
-int runSpeed = 8.5;
+u64 gameCountdown = SECS_TO_TICKS(4);
+int runSpeed = 20;
 
 int buttonCooldown = 0; // Used for menu navigating
 int aimFPS = 60;
@@ -28,4 +28,5 @@ int aimFPS = 60;
 #define OPTION 0x99999900
 
 int selectedOption = 0;
+
 void run_game(bool debugMode);

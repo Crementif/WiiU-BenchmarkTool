@@ -81,8 +81,7 @@ void drawStatusScreen()
 		drawText(-1, 1, 5+testResultCount+5, 0xFF505000, "Debug Message:");
 		drawText(-1, 1, 5+testResultCount+6, 0xFF505000, debugMessage);
 	}
-	OSScreenFlipBuffersEx(0);
-	OSScreenFlipBuffersEx(1);
+	finishFrame();
 }
 
 void drawResult()
@@ -125,6 +124,12 @@ int mainFunc(void)
 	OSScreenClearBufferEx(0, 0);
 	OSScreenClearBufferEx(1, 0);
 	OSScreenFlipBuffersEx(0);
+	OSScreenFlipBuffersEx(1);
+	
+	gamepadframeBufferFrontPtr = (uint8*)(0xF4000000+OSScreenGetBufferSizeEx(0)) + (0*(896*480*4));
+	gamepadframeBufferBackPtr = (uint8*)(0xF4000000+OSScreenGetBufferSizeEx(0)) + (1*(896*480*4));
+	gamepadframeBufferHexPtr = (uint32*)gamepadframeBufferFrontPtr;
+	frameBufferHexPtr = (uint32*)frameBufferFrontPtr;
 	
 	drawStatusScreen();
 	

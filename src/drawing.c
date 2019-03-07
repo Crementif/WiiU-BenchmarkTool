@@ -1622,7 +1622,8 @@ sint32 _getGetFontCharIndex(char c)
 void plotFontPixel(sint32 bufferNum, sint32 px, sint32 py, uint32 color, int depth)
 {
 	for (int i=0; i<depth; i++) {
-		OSScreenPutPixelEx(bufferNum, px+i, py+i, color);
+		//OSScreenPutPixelEx(bufferNum, px+i, py+i, color);
+		setPixel(bufferNum, px+i, py+i, color);
 	}
 }
 
@@ -1667,11 +1668,14 @@ void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, b
 		}
 		else
 		{
-			for (sint32 fy = 0; fy < 16; fy++)
+			if (clearPixels)
 			{
-				for (sint32 fx = 0; fx < 8; fx++)
+				for (sint32 fy = 0; fy < 16; fy++)
 				{
-					plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
+					for (sint32 fx = 0; fx < 8; fx++)
+					{
+						plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
+					}
 				}
 			}
 		}

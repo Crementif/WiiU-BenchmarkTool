@@ -39,6 +39,22 @@ int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot, const 
 void (*VPADBASEInit)(void);
 int (*VPADRead)(int padnum, void/*VPADData*/ *buffer, int num_datasets, int *err);
 
+// nsysnet
+void (*socket_lib_init)(void);
+int (*socket)(int domain, int type, int protocol);
+int (*socketclose)(int s);
+int (*connect)(int s, void *addr, int addrlen);
+int (*bind)(s32 s, void *name, s32 namelen);
+int (*listen)(s32 s, u32 backlog);
+int (*accept)(s32 s, void *addr, s32 *addrlen);
+int (*send)(int s, const void *buffer, int size, int flags);
+int (*recv)(int s, void *buffer, int size, int flags);
+int (*sendto)(int s, const void *buffer, int size, int flags, const void *dest, int dest_len);
+int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);
+
+int (*inet_aton)(const char *cp, void *inp);
+int (*socketlasterr)(void);
+
 
 int __entry_menu(int argc, char **argv)
 {	
@@ -51,10 +67,11 @@ int __entry_menu(int argc, char **argv)
 	u32 coreinitHandle;
 	u32 nn_saveHandle;
 	u32 vpadHandle;
+	u32 netHandle;
 	OSDynLoad_Acquire("coreinit", &coreinitHandle);
 	OSDynLoad_Acquire("nn_save", &nn_saveHandle);
 	OSDynLoad_Acquire("vpad", &vpadHandle);
-	
+	OSDynLoad_Acquire("nsysnet", &netHandle);
 	
 	// coreinit OSScreen
 	OSDynLoad_FindExport(coreinitHandle, 0, "OSScreenInit", (void*)&OSScreenInit);
@@ -93,6 +110,19 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_FindExport(vpadHandle, 0, "VPADRead", (void*)&VPADRead);
 	VPADBASEInit();
 	
+	// nsysnet
+	OSDynLoad_FindExport(netHandle, 0, "socket_lib_init", (void*)&socket_lib_init);
+	
+	OSDynLoad_FindExport(netHandle, 0, "socket", (void*)&socket);
+	OSDynLoad_FindExport(netHandle, 0, "setsockopt", (void*)&setsockopt);
+	
+	OSDynLoad_FindExport(netHandle, 0, "connect", (void*)&connect);
+	OSDynLoad_FindExport(netHandle, 0, "bind", (void*)&bind);
+	OSDynLoad_FindExport(netHandle, 0, "listen", (void*)&listen);
+	OSDynLoad_FindExport(netHandle, 0, "accept", (void*)&accept);
+	OSDynLoad_FindExport(netHandle, 0, "recv", (void*)&recv);
+	OSDynLoad_FindExport(netHandle, 0, "send", (void*)&send);
+	OSDynLoad_FindExport(netHandle, 0, "socketlasterr", (void*)&socketlasterr);
 	
     int ret = mainFunc();
     return ret;
