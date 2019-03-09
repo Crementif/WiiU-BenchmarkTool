@@ -8,11 +8,11 @@ The .elf file can be run on a Wii U via Homebrew Launcher or in Cemu by launchin
 
 #### How to compile
 
-1. Get DevkitPro PPC
-2. Open BenchmarkTool.pnproj in Programmer's Notepad
-3. Run `make` in your command prompt to compile
+1. Get DevkitPro PPC (make sure it sets the path correctly)
+2. Run the `make` command in your command prompt while being in the project root directory.
 
-Optional: Add Make as a shortcut in Programmer's Notepad
-4. Click Tools -> Options, then navigate to Project Tools.
-5. Click on Add and fill the fields in [like this.](https://i.imgur.com/EYk3VjJ.png)
-6. Now, you should be able to compile if you press F5 or if you go to Tools -> Compile
+#### How to make changes (with Visual Studio)
+
+1. Open the "Wii U Benchmark.sln" file to open the project.
+2. Optionally, you can use the Debug functionality of VS if you have a Cemu folder in the project root with a Cemu installation in it.
+3. Additionally, if you want to get intellisense to work, you'll need to insert your own PPC paths by going to `Project`->`Properties`->`Nmake` and changing the Include Search Path with your own DevkitPro location.

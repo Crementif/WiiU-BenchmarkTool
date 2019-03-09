@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <time.h>
-#include "frameBuffer.h"
+#include "..\frameBuffer.h"
 #include "game.h"
 #include "rendering.h"
 #include "multiplayer.h"

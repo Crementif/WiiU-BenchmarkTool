@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\benchmark">
+      <UniqueIdentifier>{c2a7f068-47d5-4557-892c-9c408e7329a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game">
+      <UniqueIdentifier>{0b2004b5-625f-4cef-b96f-515991f58f8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test7">
+      <UniqueIdentifier>{ea3e7137-dbc6-4883-a3d6-377885aa1ffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test6">
+      <UniqueIdentifier>{1bbb40cd-ddf3-4edf-aacc-f6a64752f4a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test5">
+      <UniqueIdentifier>{ebd0cc4b-608e-4295-9db9-50d2be205732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test4">
+      <UniqueIdentifier>{6be2c181-5dd6-4ab0-acd8-d5b231597d5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test3">
+      <UniqueIdentifier>{92998f6e-4c46-4ec0-93c0-fba865f0f009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test2">
+      <UniqueIdentifier>{4462434d-3f86-4921-b144-ef8174d7663b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\benchmark\test1">
+      <UniqueIdentifier>{37bd14fa-fe2d-4595-a0c0-9051a97f2436}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\test1.c">
+      <Filter>Source Files\benchmark\test1</Filter>
+    </ClCompile>
+    <ClCompile Include="src\aes.c">
+      <Filter>Source Files\benchmark\test2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test2.c">
+      <Filter>Source Files\benchmark\test2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test3.c">
+      <Filter>Source Files\benchmark\test3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test4.c">
+      <Filter>Source Files\benchmark\test4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test5.c">
+      <Filter>Source Files\benchmark\test5</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test6.c">
+      <Filter>Source Files\benchmark\test6</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test7.c">
+      <Filter>Source Files\benchmark\test7</Filter>
+    </ClCompile>
+    <ClCompile Include="src\drawing.c">
+      <Filter>Source Files\benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entry.c">
+      <Filter>Source Files\benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.c">
+      <Filter>Source Files\benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\game.c">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\aes.h">
+      <Filter>Source Files\benchmark\test2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\benchmarkTests.h">
+      <Filter>Source Files\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="src\frameBuffer.h">
+      <Filter>Source Files\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="src\main.h">
+      <Filter>Source Files\benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\game.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\multiplayer.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\objects.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\rendering.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\sprites.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\vpad.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

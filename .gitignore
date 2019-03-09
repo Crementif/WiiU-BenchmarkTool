@@ -1,4 +1,6 @@
 
+Cemu/
+
 build/
 
 benchmark\.elf
@@ -6,3 +8,5 @@ benchmark\.elf
 benchmark_dbg\.elf
 
 benchmarktool\.pnps
+
+\.vs/
