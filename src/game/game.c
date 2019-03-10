@@ -22,7 +22,7 @@ void drawIntro(bool debugMode) {
 }
 
 bool disableCounter = false;
-sint64 firstCountdownMeasure = 0;
+s64 firstCountdownMeasure = 0;
 int retries = 0;
 
 void drawGameOver() {
@@ -110,14 +110,14 @@ void drawOptionMenu() {
 
 bool waitingForConnection = true;
 
-bool drawGame(bool hostOrClient) {
-	if (hostOrClient == true) {
+bool drawGame() {
+	if (gameState == GAMEPLAY_HOST) {
 		// Initialize server and wait for a connection response
 		waitForConnection();
 	}
 	//else if (gameState == GAMEPLAY_HOST)
 	if (firstCountdownMeasure == 0) firstCountdownMeasure = OSGetTime()+SECS_TO_TICKS(4);
-	sint64 gameCountdownPast = firstCountdownMeasure - OSGetTime();
+	s64 gameCountdownPast = firstCountdownMeasure - OSGetTime();
 	
 	bool playerIsDead = false;
 	if (gameCountdownPast > 0) {
@@ -130,9 +130,9 @@ bool drawGame(bool hostOrClient) {
 	if (gameCountdownPast < -1) disableCounter = true;
 	
 	if (!disableCounter) {
-		if (gameCountdownPast > (sint64)SECS_TO_TICKS(3)) drawTextEx(0, 72, 3, 0xFF905000, "3", false, 2, 2);
-		else if (gameCountdownPast > (sint64)SECS_TO_TICKS(2)) drawTextEx(0, 72, 3, 0xFF905000, "2", false, 2, 2);
-		else if (gameCountdownPast > (sint64)SECS_TO_TICKS(1)) drawTextEx(0, 72, 3, 0xFF905000, "1", false, 2, 2);
+		if (gameCountdownPast > (s64)SECS_TO_TICKS(3)) drawTextEx(0, 72, 3, 0xFF905000, "3", false, 2, 2);
+		else if (gameCountdownPast > (s64)SECS_TO_TICKS(2)) drawTextEx(0, 72, 3, 0xFF905000, "2", false, 2, 2);
+		else if (gameCountdownPast > (s64)SECS_TO_TICKS(1)) drawTextEx(0, 72, 3, 0xFF905000, "1", false, 2, 2);
 		else drawTextEx(0, 72, 3, 0xFF905000, "GO", false, 2, 2);
 	}
 	return playerIsDead;
@@ -151,8 +151,7 @@ void run_game(bool debugMode)
 		bool playerIsDead = false;
 		if (gameState == INTRO) drawIntro(debugMode);
 		if (gameState == MAIN_MENU) drawMenu();
-		if (gameState == GAMEPLAY_CLIENT) playerIsDead = drawGame(false);
-		if (gameState == GAMEPLAY_HOST) playerIsDead = drawGame(true);
+		if (gameState == GAMEPLAY_CLIENT || gameState == GAMEPLAY_HOST) playerIsDead = drawGame();
 		if (gameState == GAME_OVER) drawGameOver();
 		if (gameState == OPTION_MENU) drawOptionMenu();
 		if (playerIsDead) gameState = GAME_OVER;

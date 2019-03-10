@@ -54,33 +54,36 @@ void printStatusText(char* text) {
 	finishFrame();
 }
 
+bool initializeSocket = true;
+struct sockaddr_in socket_addr;
+
+#define RECVBUFFER_SIZE (20)
+char recvBuffer[RECVBUFFER_SIZE];
+
 bool waitForConnection() {
-	client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-	printStatusText("Used potatoes to create a new power socket!");
-	if (client_socket < 0)	return false;
-	u32 enableOpt = 1;
-	setsockopt(client_socket, SOL_SOCKET, SO_NONBLOCK, &enableOpt, sizeof(enableOpt));
-	setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &enableOpt, sizeof(enableOpt));
-	printStatusText("Genetically modified the potato to be non-blocking...");
-	
-	struct sockaddr_in socket_addr;
-	memset(&socket_addr, 0, sizeof(socket_addr));
-	socket_addr.sin_family = AF_INET;
-	socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	socket_addr.sin_port = htons(8891);
-	
-	s32 retValue;
-	retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
-	if (retValue < 0) return false;
-	printStatusText("Strapped some potatoes together for more power!!!");
-	retValue = listen(client_socket, 3);
-	if (retValue < 0) return false;
-	printStatusText("I think my power socket now listens to me?");
-	
-	s32 serverStructSize = sizeof(struct sockaddr_in);
-	accept(client_socket, &socket_addr, &serverStructSize);
-	printStatusText("Accepted my potatoes for the people they truly are...");
-	while (true) {
+	if (initializeSocket) {
+		client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);
+		printStatusText("Used potatoes to create a new power socket!");
+		if (client_socket < 0)	return false;
+
+		u32 enableOpt = 1;
+		setsockopt(client_socket, SOL_SOCKET, SO_NONBLOCK, &enableOpt, sizeof(enableOpt));
+		setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &enableOpt, sizeof(enableOpt));
+		printStatusText("Genetically modified the potato to be non-blocking...");
+		memset(&socket_addr, 0, sizeof(socket_addr));
+		socket_addr.sin_family = AF_INET;
+		socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		socket_addr.sin_port = htons(8891);
+
+		s32 retValue;
+		retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
+		if (retValue < 0) return false;
+		printStatusText("Strapped some potatoes together for more power!!!");
+		initializeSocket = false;
 	}
-	return true;
+
+	char *bufferStatus[10];
+	int recvStatus = recv(client_socket, recvBuffer, RECVBUFFER_SIZE, );
+	itoa(recvStatus, bufferStatus, 10);
+	printStatusText(*bufferStatus);
 }
