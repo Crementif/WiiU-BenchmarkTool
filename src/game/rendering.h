@@ -3,10 +3,7 @@
 
 #define GRID_DEBUG (0)
 
-uint64 randInt(uint64 seed);
-uint64 levelSeed = 0;
-uint64 blocksTraversed = 0;
-int score = 0;
+u64 randInt(u64 seed);
 
 // Handle transitions between the "full" states (where exactly 16 blocks are present)
 int scrollPixelOffset = 0;
@@ -21,7 +18,7 @@ void drawBlock(int gridX, int gridY, blockType blockDrawType) {
 		if (gridY+y < 0 || gridY+y > 720) continue;
 		for (int x=0; x<BLOCK_PIXEL_WIDTH-GRID_DEBUG; x++) {
 			if (gridX+x-scrollPixelOffset < 0 || gridX+x-scrollPixelOffset > 1280) continue;
-			uint32 color = 0xf200ff00;
+			u32 color = 0xf200ff00;
 			if (blockDrawType == Air) color = 0xefefef00;
 			else if (blockDrawType == Block) color = 0x38333300;
 			frameBufferHexPtr[(gridX+x-scrollPixelOffset)+((gridY+y)*1280)] = color;

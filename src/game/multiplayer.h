@@ -23,6 +23,8 @@
 #define ENOMEM          18
 #define EINPROGRESS     22
 
+#define MSG_DONTWAIT    0x0020
+
 #define htonl(x) x
 #define htons(x) x
 #define ntohl(x) x
@@ -37,14 +39,11 @@ struct sockaddr_in {
 	struct in_addr sin_addr;
 	char sin_zero[8];
 };
-
 struct sockaddr
 {
 	unsigned short sa_family;
 	char sa_data[14];
 };
-
-int client_socket = -1;
 
 void printStatusText(char* text) {
 	OSScreenClearBufferEx(0, 0);
@@ -58,11 +57,12 @@ bool initializeSocket = true;
 struct sockaddr_in socket_addr;
 
 #define RECVBUFFER_SIZE (20)
-char recvBuffer[RECVBUFFER_SIZE];
+char *recvBuffer[RECVBUFFER_SIZE];
+int client_socket = -1;
 
 bool waitForConnection() {
 	if (initializeSocket) {
-		client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);
+		client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		printStatusText("Used potatoes to create a new power socket!");
 		if (client_socket < 0)	return false;
 
@@ -70,7 +70,6 @@ bool waitForConnection() {
 		setsockopt(client_socket, SOL_SOCKET, SO_NONBLOCK, &enableOpt, sizeof(enableOpt));
 		setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &enableOpt, sizeof(enableOpt));
 		printStatusText("Genetically modified the potato to be non-blocking...");
-		memset(&socket_addr, 0, sizeof(socket_addr));
 		socket_addr.sin_family = AF_INET;
 		socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 		socket_addr.sin_port = htons(8891);
@@ -81,9 +80,11 @@ bool waitForConnection() {
 		printStatusText("Strapped some potatoes together for more power!!!");
 		initializeSocket = false;
 	}
-
-	char *bufferStatus[10];
-	int recvStatus = recv(client_socket, recvBuffer, RECVBUFFER_SIZE, );
+	char bufferStatus[10];
+	int recvStatus = recv(client_socket, recvBuffer, RECVBUFFER_SIZE, MSG_DONTWAIT);
+	if (recvStatus > 0) {
+	}
 	itoa(recvStatus, bufferStatus, 10);
-	printStatusText(*bufferStatus);
+	printStatusText(bufferStatus);
+	return false;
 }
