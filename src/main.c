@@ -163,7 +163,7 @@ int mainFunc(void)
 unsigned char* fsBuffer = 0;
 
 // Implement Xorshift RNG
-uint64 randInt(uint64 seed)
+u64 randInt(u64 seed)
 {
 	seed ^= seed << 13;
 	seed ^= seed >> 17;

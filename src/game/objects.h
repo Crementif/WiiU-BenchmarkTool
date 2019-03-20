@@ -1,5 +1,6 @@
 #include "vpad.h"
 #include "sprites.h"
+#include "multiplayer.h"
 
 #define STAGE_HEIGHT (9)
 #define STAGE_WIDTH (16)
@@ -15,6 +16,7 @@
 #define PLAYER_PIXEL_HEIGHT (PLAYER_FEET_HEIGHT+PLAYER_ARRAY_HEIGHT*PLAYER_SCALE)
 #define RUNNER_X_POS (BLOCK_PIXEL_WIDTH*2)
 
+
 typedef enum {
 	Air,
 	Block,
@@ -29,16 +31,11 @@ typedef enum {
 } obstacleType;
 
 blockType gridLayout[STAGE_WIDTH+1][STAGE_HEIGHT];
+struct gameStateStruct gameState;
 
-int previousBottomYPos = BLOCK_PIXEL_HEIGHT*(STAGE_HEIGHT-1)-(PLAYER_PIXEL_HEIGHT*2);
-
-int upVelocity = 0;
-int downVelocity = 0;
-int gravity = 2;
 int legsFrame = 0;
 
-const char* playerHeads[] = {"Bignose", "Exzap", "Cellhunter", "Petergov", "Zabivaka", "Chriztr", "Rich Evans"};
-int headUsed = 0;
+const char* playerHeads[] = {"Bignose", "Exzap", "Cellhunter", "Petergov", "Zabivaka", "Chriztr", "Rich Evans"}; 
 
 void drawPlayer(int drawYPos) {
 	int arrayIndex = 0;
@@ -48,7 +45,7 @@ void drawPlayer(int drawYPos) {
 			
 			if (trashcan_body_sprite[arrayIndex] == 0x00) {
 				if (y/PLAYER_SCALE >= 2 && y/PLAYER_SCALE <= 12) {
-					switch(headUsed) {
+					switch(gameState.infectionLevel) {
 						case 0:
 							color = bignose_head_sprite[arrayIndex-(PLAYER_ARRAY_WIDTH*2)];
 							break;
@@ -105,42 +102,44 @@ void drawPlayer(int drawYPos) {
 	if (legsFrame>=250) legsFrame = 0;
 }
 
-bool renderPlayer(VPADData* controller) {
-	int newBottomYPos = previousBottomYPos;
+void renderPlayer(VPADData* controller) {
+	int nextYPos = gameState.yPosition;
 	
-	int lowestPoint = BLOCK_PIXEL_HEIGHT*STAGE_HEIGHT;
+	int lowestSurfacePos = BLOCK_PIXEL_HEIGHT*STAGE_HEIGHT;
 	for (int y=0; y<STAGE_HEIGHT; y++) { // Calculate height from ground
 		if (gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH][y] == Block || gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH+1][y] == Block) {
-			lowestPoint = BLOCK_PIXEL_HEIGHT*y;
+			lowestSurfacePos = BLOCK_PIXEL_HEIGHT*y;
 			break;
 		}
 	}
 	
-	if (controller->buttonTrigger&VPAD_BUTTON_A && lowestPoint-previousBottomYPos == 0) {
-		upVelocity = 55;
+	if (controller->buttonTrigger&VPAD_BUTTON_A && lowestSurfacePos-gameState.yPosition == 0) {
+		// Player pressed jump and was on surface
+		gameState.upVelocity = JUMP_VELOCITY;
 	}
-	upVelocity -= 2;
-	if (upVelocity < 0) {
-		upVelocity = 0;
+	gameState.upVelocity -= GRAVITY;
+	if (gameState.upVelocity < 0) {
+		// Player on surface
+		gameState.upVelocity = 0;
 		legsFrame+=10;
 	}
 	
-	if (lowestPoint-previousBottomYPos > 0) {
-		downVelocity += gravity;
+	if (lowestSurfacePos-gameState.yPosition > 0) {
+		// Accelerate falling when longer in the air
+		gameState.downVelocity += GRAVITY;
 	}
-	else if (lowestPoint-previousBottomYPos == 0) {
-		downVelocity = 0;
+	else if (lowestSurfacePos-gameState.yPosition == 0) {
+		gameState.downVelocity = 0;
 	}
 	else {
-		return true;
+		if (currScreen != GAMEPLAY_CLIENT) gameState.hostCollided = true;
 	}
-	if (previousBottomYPos == 720) {
-		return true;
+	if (gameState.downVelocity > lowestSurfacePos-gameState.yPosition) nextYPos += lowestSurfacePos-gameState.yPosition;
+	else nextYPos += gameState.downVelocity;
+	nextYPos -= gameState.upVelocity;
+	gameState.yPosition = nextYPos;
+	if (nextYPos == 720) {
+		if (currScreen != GAMEPLAY_CLIENT) gameState.hostCollided = true;
 	}
-	if (downVelocity > lowestPoint-previousBottomYPos) newBottomYPos += lowestPoint-previousBottomYPos;
-	else newBottomYPos += downVelocity;
-	newBottomYPos -= upVelocity;
-	previousBottomYPos = newBottomYPos;
-	drawPlayer(newBottomYPos-PLAYER_PIXEL_HEIGHT);
-	return false;
+	drawPlayer(nextYPos-PLAYER_PIXEL_HEIGHT);
 }

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+void setPixel(sint32 bufferNum, uint32 x, uint32 y, uint32 color);
+
 const uint8 font8x15[] = 
 {
 	// @0 '!' (8 pixels wide)
@@ -1622,7 +1624,6 @@ sint32 _getGetFontCharIndex(char c)
 void plotFontPixel(sint32 bufferNum, sint32 px, sint32 py, uint32 color, int depth)
 {
 	for (int i=0; i<depth; i++) {
-		//OSScreenPutPixelEx(bufferNum, px+i, py+i, color);
 		setPixel(bufferNum, px+i, py+i, color);
 	}
 }

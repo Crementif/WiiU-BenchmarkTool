@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 // This test fills a buffer with random numbers, size determined by BUFFER_SIZE in main.h
-
+u64 randInt(u64 seed);
 
 int test5_run()
 {

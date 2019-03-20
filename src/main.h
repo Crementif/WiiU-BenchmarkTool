@@ -18,6 +18,7 @@ int mainFunc(void);
 
 #define BUS_SPEED                       248625000
 #define SECS_TO_TICKS(sec)              (((unsigned long long)(sec)) * (BUS_SPEED/4))
+#define TICKS_TO_SECS(ticks)            (((unsigned long long)(ticks)) / (BUS_SPEED/4))
 #define MILLISECS_TO_TICKS(msec)        (SECS_TO_TICKS(msec) / 1000)
 #define MICROSECS_TO_TICKS(usec)        (SECS_TO_TICKS(usec) / 1000000)
 
@@ -79,17 +80,14 @@ extern int (*VPADRead)(int padnum, void/*VPADData*/ *buffer, int num_datasets, i
 extern void (*socket_lib_init)(void);
 extern int (*socket)(int domain, int type, int protocol);
 extern int (*socketclose)(int s);
-extern int (*connect)(int s, void *addr, int addrlen);
 extern int (*bind)(s32 s, void *name, s32 namelen);
-extern int (*listen)(s32 s, u32 backlog);
-extern int (*accept)(s32 s, void *addr, s32 *addrlen);
-extern int (*send)(int s, const void *buffer, int size, int flags);
 extern int (*recv)(int s, void *buffer, int size, int flags);
-extern int (*sendto)(int s, const void *buffer, int size, int flags, const void *dest, int dest_len);
+extern int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int srclen);
+extern int (*send)(int s, const void *buffer, int size, int flags);
+extern int (*sendto)(int s, const void *buffer, int size, int flags, void *dest_addr, int destlen);
 extern int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);
 
-extern int (*inet_aton)(const char *cp, void *inp);
-extern int (*socketlasterr)(void);
+extern int (*inet_pton)(int af, const char *src, void *dst);
 
 // buffer size for random and write test
 #define BUFFER_SIZE 20000000

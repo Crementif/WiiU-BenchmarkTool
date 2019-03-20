@@ -1,22 +1,19 @@
 #include <stdlib.h>
 #include "objects.h"
 
-#define GRID_DEBUG (0)
-
-u64 randInt(u64 seed);
-
-// Handle transitions between the "full" states (where exactly 16 blocks are present)
+// Handle transitions between the "full" states
 int scrollPixelOffset = 0;
 float scrollSubpixelOffset = 0;
 
 int blockQueueLength = 0;
 obstacleType blockQueueType;
 obstacleType lastBlockType;
+u64 randInt(u64 seed);
 
 void drawBlock(int gridX, int gridY, blockType blockDrawType) {
-	for (int y=0; y<BLOCK_PIXEL_HEIGHT-GRID_DEBUG; y++) {
+	for (int y=0; y<BLOCK_PIXEL_HEIGHT; y++) {
 		if (gridY+y < 0 || gridY+y > 720) continue;
-		for (int x=0; x<BLOCK_PIXEL_WIDTH-GRID_DEBUG; x++) {
+		for (int x=0; x<BLOCK_PIXEL_WIDTH; x++) {
 			if (gridX+x-scrollPixelOffset < 0 || gridX+x-scrollPixelOffset > 1280) continue;
 			u32 color = 0xf200ff00;
 			if (blockDrawType == Air) color = 0xefefef00;
@@ -56,7 +53,7 @@ void generateObstacleLine() {
 	if (blockQueueLength == 0) {
 		int extraSeed = 0;
 		while (blockQueueType == lastBlockType) {
-			blockQueueType = randInt(levelSeed+blocksTraversed+extraSeed) % (2 + 1);
+			blockQueueType = randInt(gameState.levelSeed+gameState.blocksTraversed+extraSeed) % (2 + 1);
 			extraSeed++;
 		}
 		lastBlockType = blockQueueType;
@@ -73,17 +70,8 @@ void generateObstacleLine() {
 			insertGapPlatform();
 			break;
 	}
-	score++;
-	blocksTraversed++;
-}
-
-void initializeLevelGrid() {
-	for (int x=0; x<STAGE_WIDTH+1; x++) {
-		for (int y=0; y<STAGE_HEIGHT; y++) {
-			if (y==STAGE_HEIGHT-1) gridLayout[x][y]=Block;
-			else gridLayout[x][y]=Air;
-		}
-	}
+	gameState.score++;
+	gameState.blocksTraversed++;
 }
 
 void drawGrid() {
@@ -113,12 +101,24 @@ void createVerticalLine() {
 	generateObstacleLine();
 }
 
-bool renderLevel(int backgroundScrollSpeed, VPADData* controller) {
-	scrollSubpixelOffset+=backgroundScrollSpeed;
+void drawScore(unsigned char scoreXPos, unsigned char scoreYPos) {
+	char scoreCharBuffer[] = "Score: 4294967295\0";
+	itoa(gameState.score, scoreCharBuffer+7, 10);
+	drawTextEx(0, scoreXPos, scoreYPos, 0xFF905000, scoreCharBuffer, false, 2, 1);
+	if (currScreen != GAMEPLAY_CLIENT) {
+		if (localHighscore < gameState.score) localHighscore = gameState.score;
+		char highscoreCharBuffer[] = "Highscore: 4294967295\0";
+		itoa(localHighscore, highscoreCharBuffer+11, 10);
+		drawTextEx(0, scoreXPos, scoreYPos - 2, 0xFF905000, highscoreCharBuffer, false, 2, 1);
+	}
+}
+
+void renderLevel(VPADData* controller) {
+	if (!gameState.hostCollided) scrollSubpixelOffset+=gameState.scrollSpeed;
 	scrollPixelOffset = (int)scrollSubpixelOffset;
 	if (scrollPixelOffset >= BLOCK_PIXEL_WIDTH) {
 		createVerticalLine();
 	}
 	drawGrid();
-	return renderPlayer(controller);
+	renderPlayer(controller);
 }
