@@ -156,7 +156,7 @@ int mainFunc(void)
 		drawResult();
 		OSSleepTicks(MILLISECS_TO_TICKS(1000/30)); // aim for roughly 30 FPS
 	}
-	run_game(false);
+	run_game();
 	return 0;
 }
 

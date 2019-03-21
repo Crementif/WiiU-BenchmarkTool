@@ -82,7 +82,7 @@ extern int (*socket)(int domain, int type, int protocol);
 extern int (*socketclose)(int s);
 extern int (*bind)(s32 s, void *name, s32 namelen);
 extern int (*recv)(int s, void *buffer, int size, int flags);
-extern int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int srclen);
+extern int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int *srclen);
 extern int (*send)(int s, const void *buffer, int size, int flags);
 extern int (*sendto)(int s, const void *buffer, int size, int flags, void *dest_addr, int destlen);
 extern int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);

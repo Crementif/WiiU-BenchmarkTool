@@ -9,9 +9,9 @@ VPADData vpadData;
 void switchScreen(unsigned char toScreen);
 u64 randInt(u64 seed);
 
-void drawIntro(bool debugMode) {
+void drawIntro() {
 	drawTextEx(0, 65, 20, 0xF4424200, "Powered by the Trash bites! engine", true, 4, (int)(4.0-animationTimestamp)+1);
-	if (animationTimestamp > 4 || debugMode) switchScreen(MAIN_MENU);
+	if (animationTimestamp > 4 || DEBUG_GAME) switchScreen(MAIN_MENU);
 }
 
 void drawGameOver() {
@@ -143,7 +143,7 @@ void switchScreen(unsigned char toScreen) {
 	currScreen = toScreen;
 }
 
-void run_game(bool debugMode)
+void run_game()
 {
 	socket_lib_init();
 	animationStartTimestamp = OSGetTime();
@@ -157,7 +157,7 @@ void run_game(bool debugMode)
 			animationStartTimestamp = currTimestamp;
 		}
 		VPADRead(0, &vpadData, 1, &vpadError);
-		if (currScreen == INTRO) drawIntro(debugMode);
+		if (currScreen == INTRO) drawIntro();
 		if (currScreen == MAIN_MENU) drawMenu();
 		if (currScreen == GAMEPLAY_LOCAL || currScreen == GAMEPLAY_CLIENT || currScreen == GAMEPLAY_HOST) drawGame();
 		if (currScreen == OPTION_MENU) drawOptionMenu();

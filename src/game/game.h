@@ -32,6 +32,6 @@ unsigned int localHighscore = 0;
 #define GRAVITY (2)
 #define JUMP_VELOCITY (55)
 
-char *ipAddress = "127.0.0.1";
+char ipAddress[] = "localhost";
 
-void run_game(bool debugMode);
+#define DEBUG_GAME (true)

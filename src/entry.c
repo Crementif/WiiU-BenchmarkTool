@@ -46,7 +46,7 @@ int (*socketclose)(int s);
 int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);
 int (*bind)(s32 s, void *name, s32 namelen);
 int (*recv)(int s, void *buffer, int size, int flags);
-int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int srclen);
+int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int *srclen);
 int (*send)(int s, const void *buffer, int size, int flags);
 int (*sendto)(int s, const void *buffer, int size, int flags, void *dest_addr, int destlen);
 
