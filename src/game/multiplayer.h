@@ -97,7 +97,7 @@ bool initializeSocket() {
 	socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	if (GAMEPLAY_HOST) {
 		socket_addr.sin_port = htons(8891);
-		s32 retValue;
+		int retValue;
 		retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
 		if (retValue < 0) return false;
 		printStatusText("Strapped some potatoes together for more power!!!");
