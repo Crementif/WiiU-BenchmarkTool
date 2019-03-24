@@ -108,7 +108,7 @@ void switchScreen(unsigned char toScreen) {
 			break;
 		case GAMEPLAY_HOST:
 		case GAMEPLAY_CLIENT:
-			if (!initializeSocket()) {
+			if (!initializeSocket(toScreen == GAMEPLAY_HOST)) {
 				// If initialization failed, that status should be kept on screen.
 				while (true) {
 					printStatusText("Socket initialization failed...");

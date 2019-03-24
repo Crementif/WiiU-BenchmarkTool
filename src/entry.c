@@ -49,7 +49,7 @@ int (*recv)(int s, void *buffer, int size, int flags);
 int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr, int *srclen);
 int (*send)(int s, const void *buffer, int size, int flags);
 int (*sendto)(int s, const void *buffer, int size, int flags, void *dest_addr, int destlen);
-
+int (*socketlasterr)(void);
 int (*inet_pton)(int af, const char *src, void *dst);
 
 
@@ -115,6 +115,7 @@ int __entry_menu(int argc, char **argv)
 	OSDynLoad_FindExport(netHandle, 0, "setsockopt", (void*)&setsockopt);
 	OSDynLoad_FindExport(netHandle, 0, "bind", (void*)&bind);
 	OSDynLoad_FindExport(netHandle, 0, "inet_pton", (void*)&inet_pton);
+	OSDynLoad_FindExport(netHandle, 0, "socketlasterr", (void*)&socketlasterr);
 
 	OSDynLoad_FindExport(netHandle, 0, "recv", (void*)&recv);
 	OSDynLoad_FindExport(netHandle, 0, "recvfrom", (void*)&recvfrom);

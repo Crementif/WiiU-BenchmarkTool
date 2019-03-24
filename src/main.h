@@ -86,7 +86,7 @@ extern int (*recvfrom)(int s, void *buffer, int size, int flags, void *src_addr,
 extern int (*send)(int s, const void *buffer, int size, int flags);
 extern int (*sendto)(int s, const void *buffer, int size, int flags, void *dest_addr, int destlen);
 extern int (*setsockopt)(int s, int level, int optname, void *optval, int optlen);
-
+extern int (*socketlasterr)(void);
 extern int (*inet_pton)(int af, const char *src, void *dst);
 
 // buffer size for random and write test

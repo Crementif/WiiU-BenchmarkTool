@@ -3,6 +3,7 @@
 
 #define INADDR_ANY (0)
 #define AF_INET	(2)
+#define AF_INET6 (23)
 #define SOCK_STREAM	(1)
 #define SOL_SOCKET (-1)
 #define SOCK_DGRAM (2)
@@ -14,6 +15,7 @@
 #define SO_REUSEADDR    0x0004
 #define SO_NONBLOCK     0x1016
 
+#define ESUCCESS        0
 #define ENODATA         1
 #define EISCONN         3
 #define EWOULDBLOCK     6
@@ -88,28 +90,30 @@ char pingBuffer[] = "PING";
 
 int client_socket = -1;
 
-bool initializeSocket() {
-	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+bool initializeSocket(bool initializeHost) {
+	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	printStatusText("Used potatoes to create a new power socket!");
 	if (client_socket < 0)	return false;
 
 	u32 enableOpt = 1;
 	memset(&socket_addr, 0, sizeof(socket_addr));
 	memset(&connected_addr, 0, sizeof(connected_addr));
-	setsockopt(client_socket, SOL_SOCKET, SO_NONBLOCK, &enableOpt, sizeof(enableOpt));
 	setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &enableOpt, sizeof(enableOpt));
 	printStatusText("Genetically modified the potato to be non-blocking...");
 	socket_addr.sin_family = AF_INET;
 	socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	socket_addr.sin_port = htons(8890);
-	if (GAMEPLAY_HOST) {
+
+	if (initializeHost) {
 		int retValue;
 		retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
 		if (retValue < 0) return false;
 		printStatusText("Strapped some potatoes together for more power!!!");
+		memset(pingBuffer, 0, sizeof(pingBuffer));
 	}
-	else if (GAMEPLAY_CLIENT) {
-		inet_pton(AF_INET, ipAddress, &socket_addr.sin_addr);
+	else {
+		int retValue = inet_pton(AF_INET, ipAddress, &socket_addr.sin_addr);
+		if (retValue < 0) return false;
 	}
 	return true;
 }
@@ -121,21 +125,25 @@ bool initializeSocket() {
 
 bool establishConnection() {
 	if (currScreen == GAMEPLAY_HOST) {
-		int connectedAddrLen = 0;
-		int recvStatus = recvfrom(client_socket, pingBuffer, sizeof(pingBuffer), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
-		printStatusText(recvBuffer);
-		if (recvStatus == EWOULDBLOCK) {
-			while (true) { printStatusText("Connected!"); }
+		int connectedAddrLen = sizeof(socket_addr);
+		printStatusText("Waiting for a client to connect...");
+		recvfrom(client_socket, pingBuffer, sizeof(pingBuffer), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
+		int lastSocketError = socketlasterr();
+		if (lastSocketError != EWOULDBLOCK) {
 			return true;
 		}
 	}
-	if (currScreen == GAMEPLAY_CLIENT) {
-		int connectedAddrLen = 0;
-		sendto(client_socket, pingBuffer, sizeof(pingBuffer), MSG_DONTWAIT, &socket_addr, sizeof(socket_addr));
-		int recvStatus = recv(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT);
-		printDebugNumber(recvStatus);
-		if (recvStatus == EWOULDBLOCK) {
-			while (true) { printStatusText("Connected!"); }
+	else if (currScreen == GAMEPLAY_CLIENT) {
+		int connectedAddrLen = sizeof(socket_addr);
+		sendto(client_socket, pingBuffer, sizeof(pingBuffer), 0, &socket_addr, sizeof(socket_addr));
+		recvfrom(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
+		int lastSocketError = socketlasterr();
+		printStatusText("Waiting for server to respond to ping...");
+		if (lastSocketError != EWOULDBLOCK) {
+			while (true) {
+				printDebugNumber(lastSocketError);
+				finishFrame();
+			}
 			return true;
 		}
 	}
@@ -146,14 +154,15 @@ void syncStates() {
 	if (currScreen == GAMEPLAY_HOST) {
 		int connectedAddrLen = 0;
 		int recvStatus = recvfrom(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
-		if (recvStatus == EWOULDBLOCK) { // Checks if it would block
+		int lastSocketError = socketlasterr();
+		if (lastSocketError != EWOULDBLOCK) { // Checks if it would block
 			while (true) {
 				printStatusText("I got a message!");
 			}
 		}
 	}
 	else if (currScreen == GAMEPLAY_CLIENT) {
-		sendto(client_socket, recv, sizeof(struct gameStateStruct), MSG_DONTWAIT, &socket_addr, sizeof(socket_addr));
+		sendto(client_socket, recv, sizeof(struct gameStateStruct), 0, &socket_addr, sizeof(socket_addr));
 	}
 	return;
 }
