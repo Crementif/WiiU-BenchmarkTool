@@ -60,9 +60,9 @@ void drawOptionMenu() {
 	}
 	
 	if (selectedOption == 0) {
-		if (vpadData.buttonTrigger&VPAD_BUTTON_LEFT && gameState.infectionLevel >= 1) gameState.infectionLevel--;
-		if (vpadData.buttonTrigger&VPAD_BUTTON_RIGHT && gameState.infectionLevel <= 5) gameState.infectionLevel++;
-		memmove(headOptionCharBuffer+7, playerHeads[gameState.infectionLevel], 20);
+		if (vpadData.buttonTrigger&VPAD_BUTTON_LEFT && selectedInfection >= 1) selectedInfection--;
+		if (vpadData.buttonTrigger&VPAD_BUTTON_RIGHT && selectedInfection <= 5) selectedInfection++;
+		memmove(headOptionCharBuffer+7, playerHeads[selectedInfection], 20);
 	}
 	if (vpadData.buttonTrigger&VPAD_BUTTON_B) switchScreen(MAIN_MENU);
 
@@ -72,7 +72,14 @@ void drawOptionMenu() {
 }
 
 void drawGame() {
-	if (currScreen == GAMEPLAY_HOST || currScreen == GAMEPLAY_CLIENT) if (!establishConnection()) return;
+	if ((currScreen == GAMEPLAY_HOST || currScreen == GAMEPLAY_CLIENT) && !establishedConnection) {
+		if (!establishConnection(gameState)) return;
+		else {
+			establishedConnection = true;
+			animationTimestamp = 0;
+			animationStartTimestamp = OSGetTime();
+		}
+	}
 	
 	if (!gameState.hostCollided) {
 		renderLevel(&vpadData);
@@ -114,12 +121,13 @@ void switchScreen(unsigned char toScreen) {
 					printStatusText("Socket initialization failed...");
 				}
 			}
+			establishedConnection = false;
 			/* FALLTHROUGH */
 		case GAMEPLAY_LOCAL:
 			gameState = (struct gameStateStruct) {
 				.levelSeed = OSGetTime(),
 				.infectionLevel = selectedInfection,
-				.scrollSpeed = 0,
+				.scrollSpeed = selectedScrollSpeed,
 				.health = 100,
 				.score = 0,
 				.hostCollided = false,

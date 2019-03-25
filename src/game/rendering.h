@@ -114,7 +114,7 @@ void drawScore(unsigned char scoreXPos, unsigned char scoreYPos) {
 }
 
 void renderLevel(VPADData* controller) {
-	if (!gameState.hostCollided) scrollSubpixelOffset+=gameState.scrollSpeed;
+	if (!gameState.hostCollided) gameState.subPixelScrollOffset += gameState.scrollSpeed;
 	scrollPixelOffset = (int)scrollSubpixelOffset;
 	if (scrollPixelOffset >= BLOCK_PIXEL_WIDTH) {
 		createVerticalLine();

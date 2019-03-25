@@ -84,36 +84,49 @@ void printDebugNumber(int number) {
 	finishFrame();
 }
 
-struct sockaddr_in socket_addr, connected_addr;
+struct sockaddr_in socket_addr, other_addr;
 char recvBuffer[sizeof(struct gameStateStruct)];
 char pingBuffer[] = "PING";
 
 int client_socket = -1;
+bool establishedConnection = false;
 
 bool initializeSocket(bool initializeHost) {
 	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	printStatusText("Used potatoes to create a new power socket!");
 	if (client_socket < 0)	return false;
 
-	u32 enableOpt = 1;
 	memset(&socket_addr, 0, sizeof(socket_addr));
-	memset(&connected_addr, 0, sizeof(connected_addr));
+	memset(&other_addr, 0, sizeof(other_addr));
+	u32 enableOpt = 1;
 	setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &enableOpt, sizeof(enableOpt));
 	printStatusText("Genetically modified the potato to be non-blocking...");
 	socket_addr.sin_family = AF_INET;
 	socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	socket_addr.sin_port = htons(8890);
 
 	if (initializeHost) {
-		int retValue;
-		retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
+		socket_addr.sin_port = htons(8890); // The server port.
+		other_addr.sin_port = htons(8891); // The client receiving port.
+
+		// Server listening socket
+		int retValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
 		if (retValue < 0) return false;
 		printStatusText("Strapped some potatoes together for more power!!!");
 		memset(pingBuffer, 0, sizeof(pingBuffer));
 	}
 	else {
-		int retValue = inet_pton(AF_INET, ipAddress, &socket_addr.sin_addr);
-		if (retValue < 0) return false;
+		socket_addr.sin_port = htons(8891); // The client receiving port.
+		other_addr.sin_port = htons(8890); // The server port.
+		other_addr.sin_family = AF_INET;
+
+		// Client listening socket
+		int retBindValue = bind(client_socket, &socket_addr, sizeof(socket_addr));
+		if (retBindValue < 0) return false;
+		printStatusText("Strapped some potatoes together for more power!!!");
+
+		// Set the server IP
+		int retPtonValue = inet_pton(AF_INET, ipAddress, &other_addr.sin_addr);
+		if (retPtonValue < 0) return false;
 	}
 	return true;
 }
@@ -123,46 +136,41 @@ bool initializeSocket(bool initializeHost) {
 // Host: Wait for client ping, if the ping is received, start the game...
 // Client: Continuely send ping message (ping packets could drop with UDP), after it receives the host's gamestate, start the game...
 
-bool establishConnection() {
+bool establishConnection(struct gameStateStruct gameState) {
 	if (currScreen == GAMEPLAY_HOST) {
-		int connectedAddrLen = sizeof(socket_addr);
 		printStatusText("Waiting for a client to connect...");
-		recvfrom(client_socket, pingBuffer, sizeof(pingBuffer), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
+		int connectedAddrLen = sizeof(socket_addr);
+		recvfrom(client_socket, pingBuffer, sizeof(pingBuffer), MSG_DONTWAIT, &other_addr, &connectedAddrLen);
 		int lastSocketError = socketlasterr();
 		if (lastSocketError != EWOULDBLOCK) {
 			return true;
 		}
 	}
 	else if (currScreen == GAMEPLAY_CLIENT) {
-		int connectedAddrLen = sizeof(socket_addr);
-		sendto(client_socket, pingBuffer, sizeof(pingBuffer), 0, &socket_addr, sizeof(socket_addr));
-		recvfrom(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
-		int lastSocketError = socketlasterr();
 		printStatusText("Waiting for server to respond to ping...");
+		int connectedAddrLen = sizeof(socket_addr);
+		sendto(client_socket, pingBuffer, sizeof(pingBuffer), 0, &other_addr, sizeof(other_addr));
+		recvfrom(client_socket, &gameState, sizeof(struct gameStateStruct), MSG_DONTWAIT, &socket_addr, &connectedAddrLen);
+		int lastSocketError = socketlasterr();
 		if (lastSocketError != EWOULDBLOCK) {
-			while (true) {
-				printDebugNumber(lastSocketError);
-				finishFrame();
-			}
 			return true;
 		}
 	}
 	return false;
 }
 
-void syncStates() {
+void syncStates(struct gameStateStruct gameState) {
 	if (currScreen == GAMEPLAY_HOST) {
-		int connectedAddrLen = 0;
-		int recvStatus = recvfrom(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT, &connected_addr, &connectedAddrLen);
-		int lastSocketError = socketlasterr();
-		if (lastSocketError != EWOULDBLOCK) { // Checks if it would block
-			while (true) {
-				printStatusText("I got a message!");
-			}
-		}
+		sendto(client_socket, &gameState, sizeof(struct gameStateStruct), 0, &other_addr, sizeof(other_addr));
 	}
 	else if (currScreen == GAMEPLAY_CLIENT) {
-		sendto(client_socket, recv, sizeof(struct gameStateStruct), 0, &socket_addr, sizeof(socket_addr));
+		int connectedAddrLen = sizeof(socket_addr);
+		recvfrom(client_socket, recvBuffer, sizeof(struct gameStateStruct), MSG_DONTWAIT, &socket_addr, &connectedAddrLen);
+		int lastSocketError = socketlasterr();
+		if (lastSocketError != EWOULDBLOCK) {
+			memcpy(&gameState, recvBuffer, connectedAddrLen);
+		}
 	}
-	return;
 }
+
+struct gameStateStruct gameState;

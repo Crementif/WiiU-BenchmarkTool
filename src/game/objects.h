@@ -31,7 +31,7 @@ typedef enum {
 } obstacleType;
 
 blockType gridLayout[STAGE_WIDTH+1][STAGE_HEIGHT];
-struct gameStateStruct gameState;
+
 
 int legsFrame = 0;
 
@@ -113,7 +113,7 @@ void renderPlayer(VPADData* controller) {
 		}
 	}
 	
-	if (controller->buttonTrigger&VPAD_BUTTON_A && lowestSurfacePos-gameState.yPosition == 0) {
+	if (currScreen != GAMEPLAY_CLIENT && controller->buttonTrigger&VPAD_BUTTON_A && lowestSurfacePos-gameState.yPosition == 0) {
 		// Player pressed jump and was on surface
 		gameState.upVelocity = JUMP_VELOCITY;
 	}

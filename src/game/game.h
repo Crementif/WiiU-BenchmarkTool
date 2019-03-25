@@ -13,8 +13,8 @@
 unsigned char currScreen = INTRO;
 unsigned char selectedInfection = 0;
 unsigned char selectedOption = 0;
+unsigned char selectedScrollSpeed = 20; // Not available through the settings
 
-unsigned char scrollSpeed = 20;
 unsigned char targetFramerate = 60;
 
 unsigned char animationLength = 99;
@@ -32,6 +32,6 @@ unsigned int localHighscore = 0;
 #define GRAVITY (2)
 #define JUMP_VELOCITY (55)
 
-char ipAddress[] = "localhost";
+char ipAddress[] = "127.0.0.1";
 
 #define DEBUG_GAME (true)
