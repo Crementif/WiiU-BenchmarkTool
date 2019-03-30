@@ -83,7 +83,8 @@ void drawGame() {
 	syncGameState();
 	
 	if (!gameState.hostCollided) {
-		renderLevel(&vpadData);
+		renderGamepad(&vpadData);
+		renderGame(&vpadData);
 		drawScore(10, 3);
 
 		if (animationTimestamp < 1) drawTextEx(0, 72, 3, 0xFF905000, "3", false, 2, 2);

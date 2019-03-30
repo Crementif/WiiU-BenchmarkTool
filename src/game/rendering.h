@@ -111,7 +111,7 @@ void drawScore(unsigned char scoreXPos, unsigned char scoreYPos) {
 	}
 }
 
-void renderLevel(VPADData* controller) {
+void renderGame(VPADData* controller) {
 	if (!gameState.hostCollided) gameState.subPixelScrollOffset += gameState.scrollSpeed;
 	scrollPixelOffset = (int)gameState.subPixelScrollOffset;
 	if (scrollPixelOffset >= BLOCK_PIXEL_WIDTH) {
