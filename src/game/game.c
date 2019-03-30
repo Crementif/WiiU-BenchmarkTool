@@ -72,14 +72,15 @@ void drawOptionMenu() {
 }
 
 void drawGame() {
-	if ((currScreen == GAMEPLAY_HOST || currScreen == GAMEPLAY_CLIENT) && !establishedConnection) {
-		if (!establishConnection(gameState)) return;
-		else {
-			establishedConnection = true;
-			animationTimestamp = 0;
-			animationStartTimestamp = OSGetTime();
-		}
+	if (!establishedConnection) {
+		drawTextEx(0, 66, 14, 0xF4424200, "Trying to establish a connection...", true, 2, 2);
+		if (!((currScreen == GAMEPLAY_HOST) ? establishConnectionWithClient() : establishConnectionWithHost())) return;
+		sockAddressLength = sizeof(struct sockaddr_in);
+		animationTimestamp = 0;
+		animationStartTimestamp = OSGetTime();
+		establishedConnection = true;
 	}
+	syncGameState();
 	
 	if (!gameState.hostCollided) {
 		renderLevel(&vpadData);
@@ -100,53 +101,63 @@ void switchScreen(unsigned char toScreen) {
 	animationTimestamp = 0;
 	animationStartTimestamp = OSGetTime();
 	selectedOption = 0;
-	switch (toScreen) {
-		case MAIN_MENU:
-			if (currScreen == GAMEPLAY_HOST || currScreen == GAMEPLAY_CLIENT) {
-				socketclose(client_socket);
-				client_socket = -1;
-			}
-			loopAnimation = true;
-			animationLength = 5;
-			break;
-		case OPTION_MENU:
-			loopAnimation = true;
-			animationLength = 2;
-			break;
-		case GAMEPLAY_HOST:
-		case GAMEPLAY_CLIENT:
-			if (!initializeSocket(toScreen == GAMEPLAY_HOST)) {
-				// If initialization failed, that status should be kept on screen.
-				while (true) {
-					printStatusText("Socket initialization failed...");
-				}
+	establishedConnection = true;
+	sendLastMessage = false;
+
+	if (toScreen == MAIN_MENU) {
+		loopAnimation = true;
+		animationLength = 5;
+	}
+	else if (toScreen == OPTION_MENU) {
+		loopAnimation = true;
+		animationLength = 2;
+	}
+	else if (toScreen == GAMEPLAY_LOCAL || toScreen == GAMEPLAY_HOST || toScreen == GAMEPLAY_CLIENT) {
+		// Reset sockets if there has been a previous connection
+		if (client_receiving_socket != -1) {
+			socketclose(client_receiving_socket);
+			socketclose(client_destination_socket);
+			memset(&client_receiving_addr, 0, sizeof(struct sockaddr_in));
+			memset(&client_destination_addr, 0, sizeof(struct sockaddr_in));
+			client_destination_socket = -1;
+			client_receiving_socket = -1;
+		}
+		// Initialize things for online play specifically
+		if (toScreen == GAMEPLAY_HOST || toScreen == GAMEPLAY_CLIENT) {
+			if (!((toScreen == GAMEPLAY_HOST) ? initializeHost() : initializeClient())) {
+				OSScreenClearBufferEx(0, 0);
+				OSScreenClearBufferEx(1, 0);
+				drawTextEx(0, 66, 14, 0xF4424200, "Couldn't initialize the sockets :(", true, 2, 2);
+				drawText(0, 57, 16, 0xF4424200, "Make sure that you don't have another Cemu window open...");
+				drawText(0, 57, 19, 0xF4424200, "You'll need to restart this game now, though.");
+				finishFrame();
+				while (true) {}
 			}
 			establishedConnection = false;
-			/* FALLTHROUGH */
-		case GAMEPLAY_LOCAL:
-			gameState = (struct gameStateStruct) {
-				.levelSeed = OSGetTime(),
-				.infectionLevel = selectedInfection,
-				.scrollSpeed = selectedScrollSpeed,
-				.health = 100,
-				.score = 0,
-				.hostCollided = false,
-				.yPosition = BLOCK_PIXEL_HEIGHT * (STAGE_HEIGHT - 1) - (PLAYER_PIXEL_HEIGHT * 2),
-				.upVelocity = 0,
-				.downVelocity = 0,
-				.blocksTraversed = 0,
-				.subPixelScrollOffset = 0,
-			};
-			// Clear grid
-			for (int x = 0; x<STAGE_WIDTH + 1; x++) {
-				for (int y = 0; y<STAGE_HEIGHT; y++) {
-					if (y == STAGE_HEIGHT - 1) gridLayout[x][y] = Block;
-					else gridLayout[x][y] = Air;
-				}
+		}
+		// Fill gameplay struct with defaults
+		gameState = (struct gameStateStruct) {
+			.levelSeed = OSGetTime(),
+			.infectionLevel = selectedInfection,
+			.scrollSpeed = selectedScrollSpeed,
+			.health = 100,
+			.score = 0,
+			.hostCollided = false,
+			.yPosition = BLOCK_PIXEL_HEIGHT * (STAGE_HEIGHT - 1) - (PLAYER_PIXEL_HEIGHT * 2),
+			.upVelocity = 0,
+			.downVelocity = 0,
+			.blocksTraversed = 0,
+			.subPixelScrollOffset = 0,
+		};
+		// Reset the level grid to the start position
+		for (int x = 0; x < STAGE_WIDTH + 1; x++) {
+			for (int y = 0; y < STAGE_HEIGHT; y++) {
+				if (y == STAGE_HEIGHT - 1) gridLayout[x][y] = Block;
+				else gridLayout[x][y] = Air;
 			}
-			loopAnimation = false;
-			animationLength = 3;
-			break;
+		}
+		loopAnimation = false;
+		animationLength = 3;
 	}
 	currScreen = toScreen;
 }

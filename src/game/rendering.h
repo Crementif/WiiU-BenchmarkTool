@@ -3,7 +3,6 @@
 
 // Handle transitions between the "full" states
 int scrollPixelOffset = 0;
-float scrollSubpixelOffset = 0;
 
 int blockQueueLength = 0;
 obstacleType blockQueueType;
@@ -92,7 +91,7 @@ void drawGrid() {
 void createVerticalLine() {
 	// First, shift grid to left and reset the offsets
 	scrollPixelOffset = 0;
-	scrollSubpixelOffset = 0;
+	gameState.subPixelScrollOffset = 0;
 	for (int x=1; x<(STAGE_WIDTH+1); x++) {
 		for (int y=0; y<STAGE_HEIGHT; y++) {
 			gridLayout[x-1][y] = gridLayout[x][y];
@@ -115,7 +114,7 @@ void drawScore(unsigned char scoreXPos, unsigned char scoreYPos) {
 
 void renderLevel(VPADData* controller) {
 	if (!gameState.hostCollided) gameState.subPixelScrollOffset += gameState.scrollSpeed;
-	scrollPixelOffset = (int)scrollSubpixelOffset;
+	scrollPixelOffset = (int)gameState.subPixelScrollOffset;
 	if (scrollPixelOffset >= BLOCK_PIXEL_WIDTH) {
 		createVerticalLine();
 	}

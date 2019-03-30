@@ -17,10 +17,11 @@ unsigned char selectedScrollSpeed = 20; // Not available through the settings
 
 unsigned char targetFramerate = 60;
 
-unsigned char animationLength = 99;
+// Basic animation variables
 float animationTimestamp = 0;
 s64 animationStartTimestamp;
-bool loopAnimation = false;
+unsigned char animationLength = 99; // Set this to how long you want the basic animation to last
+bool loopAnimation = false; // If enabled, will make the animation timer reset if it reaches the length that's set with animationLength
 
 unsigned int localHighscore = 0;
 
