@@ -132,6 +132,7 @@
     <ClInclude Include="src\benchmarkTests.h" />
     <ClInclude Include="src\frameBuffer.h" />
     <ClInclude Include="src\game\game.h" />
+    <ClInclude Include="src\game\gamepad.h" />
     <ClInclude Include="src\game\multiplayer.h" />
     <ClInclude Include="src\game\objects.h" />
     <ClInclude Include="src\game\rendering.h" />

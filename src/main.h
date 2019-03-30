@@ -92,3 +92,6 @@ extern int (*inet_pton)(int af, const char *src, void *dst);
 // buffer size for random and write test
 #define BUFFER_SIZE 20000000
 extern unsigned char* fsBuffer;
+
+// create seeded random numbers
+u64 randInt(u64 seed);

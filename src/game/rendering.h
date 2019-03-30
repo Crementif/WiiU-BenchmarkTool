@@ -1,19 +1,18 @@
 #include <stdlib.h>
 #include "objects.h"
+#include "gamepad.h"
 
-// Handle transitions between the "full" states
 int scrollPixelOffset = 0;
 
 int blockQueueLength = 0;
 obstacleType blockQueueType;
 obstacleType lastBlockType;
-u64 randInt(u64 seed);
 
+// Draws the blocks using relative position.
 void drawBlock(int gridX, int gridY, blockType blockDrawType) {
 	for (int y=0; y<BLOCK_PIXEL_HEIGHT; y++) {
-		if (gridY+y < 0 || gridY+y > 720) continue;
-		for (int x=0; x<BLOCK_PIXEL_WIDTH; x++) {
-			if (gridX+x-scrollPixelOffset < 0 || gridX+x-scrollPixelOffset > 1280) continue;
+		for (int x=0; x<=BLOCK_PIXEL_WIDTH; x++) {
+			if (gridX+x-scrollPixelOffset < 0 || gridX+x-scrollPixelOffset >= 1280) continue;
 			u32 color = 0xf200ff00;
 			if (blockDrawType == Air) color = 0xefefef00;
 			else if (blockDrawType == Block) color = 0x38333300;
@@ -89,9 +88,9 @@ void drawGrid() {
 }
 
 void createVerticalLine() {
-	// First, shift grid to left and reset the offsets
 	scrollPixelOffset = 0;
 	gameState.subPixelScrollOffset = 0;
+	// Shift grid to left
 	for (int x=1; x<(STAGE_WIDTH+1); x++) {
 		for (int y=0; y<STAGE_HEIGHT; y++) {
 			gridLayout[x-1][y] = gridLayout[x][y];

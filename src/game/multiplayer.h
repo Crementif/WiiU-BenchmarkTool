@@ -78,7 +78,7 @@ struct gameStateStruct {
 };
 
 struct sockaddr_in client_destination_addr, client_receiving_addr;
-int client_destination_socket, client_receiving_socket = 1;
+int client_destination_socket, client_receiving_socket = -1;
 
 bool initializeHost() {
 	// Initialize server socket and address
@@ -134,7 +134,7 @@ bool establishConnectionWithHost() {
 void syncGameState() {
 	if (currScreen == GAMEPLAY_HOST && !sendLastMessage) {
 		sendto(client_receiving_socket, &gameState, sizeof(struct gameStateStruct), 0, &client_destination_addr, sizeof(struct gameStateStruct));
-		if (gameState.hostCollided == true) sendLastMessage = true;
+		if (gameState.hostCollided) sendLastMessage = true;
 	}
 	else if (currScreen == GAMEPLAY_CLIENT) {
 		recvfrom(client_receiving_socket, &gameState, sizeof(struct gameStateStruct), MSG_DONTWAIT, &client_receiving_addr, &sockAddressLength);

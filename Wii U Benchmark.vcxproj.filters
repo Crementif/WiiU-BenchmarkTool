@@ -106,5 +106,8 @@
     <ClInclude Include="src\game\vpad.h">
       <Filter>Source Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\gamepad.h">
+      <Filter>Source Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

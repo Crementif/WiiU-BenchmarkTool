@@ -91,7 +91,7 @@ void drawGame() {
 		else if (animationTimestamp < 3) drawTextEx(0, 72, 3, 0xFF905000, "1", false, 2, 2);
 		else if (animationTimestamp < 4) {
 			drawTextEx(0, 72, 3, 0xFF905000, "GO", false, 2, 2);
-			gameState.scrollSpeed = 20;
+			gameState.scrollSpeed = selectedScrollSpeed;
 		}
 	}
 	else drawGameOver();
@@ -104,6 +104,16 @@ void switchScreen(unsigned char toScreen) {
 	establishedConnection = true;
 	sendLastMessage = false;
 
+	// Reset sockets if there has been a previous connection
+	if (client_receiving_socket != -1) {
+		socketclose(client_receiving_socket);
+		socketclose(client_destination_socket);
+		memset(&client_receiving_addr, 0, sizeof(struct sockaddr_in));
+		memset(&client_destination_addr, 0, sizeof(struct sockaddr_in));
+		client_destination_socket = -1;
+		client_receiving_socket = -1;
+	}
+
 	if (toScreen == MAIN_MENU) {
 		loopAnimation = true;
 		animationLength = 5;
@@ -113,15 +123,6 @@ void switchScreen(unsigned char toScreen) {
 		animationLength = 2;
 	}
 	else if (toScreen == GAMEPLAY_LOCAL || toScreen == GAMEPLAY_HOST || toScreen == GAMEPLAY_CLIENT) {
-		// Reset sockets if there has been a previous connection
-		if (client_receiving_socket != -1) {
-			socketclose(client_receiving_socket);
-			socketclose(client_destination_socket);
-			memset(&client_receiving_addr, 0, sizeof(struct sockaddr_in));
-			memset(&client_destination_addr, 0, sizeof(struct sockaddr_in));
-			client_destination_socket = -1;
-			client_receiving_socket = -1;
-		}
 		// Initialize things for online play specifically
 		if (toScreen == GAMEPLAY_HOST || toScreen == GAMEPLAY_CLIENT) {
 			if (!((toScreen == GAMEPLAY_HOST) ? initializeHost() : initializeClient())) {
@@ -135,11 +136,12 @@ void switchScreen(unsigned char toScreen) {
 			}
 			establishedConnection = false;
 		}
+		gameState.hostCollided = true;
 		// Fill gameplay struct with defaults
 		gameState = (struct gameStateStruct) {
 			.levelSeed = OSGetTime(),
 			.infectionLevel = selectedInfection,
-			.scrollSpeed = selectedScrollSpeed,
+			.scrollSpeed = 0,
 			.health = 100,
 			.score = 0,
 			.hostCollided = false,
