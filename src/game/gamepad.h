@@ -7,7 +7,7 @@
 
 void gamepadToScreen() {
 	for (int i=0; i<GAMEPAD_HEIGHT; i++) {
-		memcpy(&frameBufferHexPtr[i*SCREEN_WIDTH], &gamepadframeBufferHexPtr[i*GAMEPAD_WIDTH], GAMEPAD_WIDTH);
+		memcpy(gamepadframeBufferHexPtr+i*GAMEPAD_WIDTH, frameBufferHexPtr+i*SCREEN_WIDTH, GAMEPAD_WIDTH);
 	}
 #if DEBUG_GAMEPAD_VIEW != true
 	OSScreenClearBufferEx(0, 0);
@@ -19,6 +19,6 @@ void screenToGamepad() {
 }
 
 void renderGamepad(VPADData* controller) {
-	drawTextEx(0, 4, 4, 0xF4424200, "GAMEPAD MENU", true, 1, 1);
+	drawTextEx(0, 4, 4, 0xFF905000, "GAMEPAD MENU", true, 3, 1);
 	gamepadToScreen();
 }
