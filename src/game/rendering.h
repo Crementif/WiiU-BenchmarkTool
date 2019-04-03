@@ -8,7 +8,28 @@ int blockQueueLength = 0;
 obstacleType blockQueueType;
 obstacleType lastBlockType;
 
-// Draws the blocks using relative position.
+void drawSprite(s8 bufferNum, u32 spritePtr[], int x, int y, int spriteHeight, int spriteWidth, int size) {
+	if (bufferNum < 0) {
+		drawSprite(0, spritePtr, x, y, spriteHeight, spriteWidth, size);
+		drawSprite(1, spritePtr, x, y, spriteHeight, spriteWidth, size);
+		return;
+	}
+	//if (x < 0 || (x + spriteWidth) >= 1280) return;
+	u32 *bufferPtr = bufferNum==0? frameBufferHexPtr : gamepadframeBufferHexPtr;
+	int bufferWidth = bufferNum==0? 1280 : 720;
+	for (int py=0; py<spriteHeight*size; py++) {
+		if (size == 1) {
+			while (true) {}
+			memcpy(bufferPtr+(x+((y+py)*bufferWidth)), spritePtr+(py*(spriteWidth-1)), spriteWidth); // Optimalize drawing by copying line by line
+		}
+		else {
+			for (int px=0; px<spriteWidth*size; px++) {
+				bufferPtr[(x+px)+((y+py)*bufferWidth)] = spritePtr[(px/size)+((py/size)*spriteWidth)];
+			}
+		}
+	}
+}
+
 void drawBlock(int gridX, int gridY, blockType blockDrawType) {
 	for (int y=0; y<BLOCK_PIXEL_HEIGHT; y++) {
 		for (int x=0; x<=BLOCK_PIXEL_WIDTH; x++) {
@@ -19,6 +40,7 @@ void drawBlock(int gridX, int gridY, blockType blockDrawType) {
 			frameBufferHexPtr[(gridX+x-scrollPixelOffset)+((gridY+y)*1280)] = color;
 		}
 	}
+	if (blockDrawType == Block) drawSprite(0, compressedtrash_block, 100, 100, 18, 16, 4);
 }
 
 void insertHighPlatform() {

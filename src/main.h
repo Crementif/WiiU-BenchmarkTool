@@ -65,6 +65,7 @@ extern int (*SAVEOpenFile)(void *client, void *block, unsigned char accountSlot,
 // drawing
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str);
 void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, bool clearPixels, int scalar, int depth);
+void drawCenteredText(sint32 bufferNum, sint32 y, uint32 color, char* str, bool clearPixels, int scalar, int depth);
 void drawHorizontalLineW2(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color);
 void drawHorizontalLineW2Ex(sint32 bufferNum, sint32 x, sint32 y, sint32 width, uint32 color, int scalar, int depth);
 void setDebugMessage(char* str);

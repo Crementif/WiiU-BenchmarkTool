@@ -78,7 +78,7 @@ void drawPlayer(int drawYPos) {
 					continue;
 				}
 			}
-			else color = trashcanPalette[trashcan_body_sprite[arrayIndex]-1];
+			else color = trashcan_body_palette[trashcan_body_sprite[arrayIndex]-1];
 			
 			for (int scaleX=0; scaleX<PLAYER_SCALE; scaleX++) {
 				for (int scaleY=0; scaleY<PLAYER_SCALE; scaleY++) {
@@ -106,20 +106,19 @@ void renderPlayer(VPADData* controller) {
 	int nextYPos = gameState.yPosition;
 	
 	int lowestSurfacePos = BLOCK_PIXEL_HEIGHT*STAGE_HEIGHT;
-	for (int y=0; y<STAGE_HEIGHT; y++) { // Calculate height from ground
+	for (int y=0; y<STAGE_HEIGHT; y++) {
 		if (gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH][y] == Block || gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH+1][y] == Block) {
+			// Calculate height from ground
 			lowestSurfacePos = BLOCK_PIXEL_HEIGHT*y;
 			break;
 		}
 	}
 	
-	if (currScreen != GAMEPLAY_CLIENT && controller->buttonTrigger&VPAD_BUTTON_A && lowestSurfacePos-gameState.yPosition == 0) {
-		// Player pressed jump and was on surface
+	if (currScreen != GAMEPLAY_CLIENT && controller->buttonTrigger&VPAD_BUTTON_A && lowestSurfacePos-gameState.yPosition == 0) { // Player pressed jump and was on surface
 		gameState.upVelocity = JUMP_VELOCITY;
 	}
 	gameState.upVelocity -= GRAVITY;
-	if (gameState.upVelocity < 0) {
-		// Player on surface
+	if (gameState.upVelocity < 0) { // Player on surface
 		gameState.upVelocity = 0;
 		legsFrame+=10;
 	}

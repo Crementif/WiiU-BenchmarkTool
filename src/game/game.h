@@ -34,5 +34,3 @@ unsigned int localHighscore = 0;
 #define JUMP_VELOCITY (55)
 
 char ipAddress[] = "127.0.0.1";
-
-#define DEBUG_GAME (true)

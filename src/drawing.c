@@ -1607,7 +1607,7 @@ const uint8 font8x15[] =
 
 char* fontCharset = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-sint32 _getGetFontCharIndex(char c)
+sint32 _getFontCharIndex(char c)
 {
 	char* charset = fontCharset;
 	while (*charset)
@@ -1628,42 +1628,49 @@ void plotFontPixel(sint32 bufferNum, sint32 px, sint32 py, uint32 color, int dep
 	}
 }
 
+void drawCenteredText(sint32 bufferNum, sint32 y, uint32 color, char* str, bool clearPixels, int size, int depth)
+{
+	drawTextEx(bufferNum, (1280/8)/2-strlen(str)/2*size, y, color, str, clearPixels, size, depth);
+}
 
 void drawText(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str)
 {
 	drawTextEx(bufferNum, x, y, color, str, true, 1, 1);
 }
 
-void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, bool clearPixels, int scalar, int depth) {
+void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, bool clearPixels, int size, int depth)
+{
 	if( bufferNum < 0 )
 	{
-		drawTextEx(0, x, y, color, str, clearPixels, scalar, depth);
-		drawTextEx(1, x, y, color, str, clearPixels, scalar, depth);
+		drawTextEx(0, x, y, color, str, clearPixels, size, depth);
+		drawTextEx(1, x, y, color, str, clearPixels, size, depth);
 		return;
 	}
 	sint32 px = x * 8;
 	sint32 py = y * 16;
-	
+
 	while (*str)
 	{
-		sint32 charIndex = _getGetFontCharIndex(*str);
+		sint32 charIndex = _getFontCharIndex(*str);
 		if (charIndex >= 0)
 		{
 			if (clearPixels) {
 				// clear area
-				for (sint32 fy = 0; fy < 16; fy++)
+				for (sint32 fy=0; fy<16*size; fy++)
 				{
-					for (sint32 fx = 0; fx < 8; fx++)
+					for (sint32 fx=0; fx<8*size; fx++)
 					{
-						plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
+						plotFontPixel(bufferNum, px+fx, py+fy, 0, depth);
 					}
 				}
 			}
 			// plot font pixels
 			const uint8* charBitmap = font8x15 + charIndex * (1 * 15);
-			for (sint32 fy=0; fy<15*scalar; fy++) {
-				for (sint32 fx=0; fx<8; fx++) {
-					if (charBitmap[fy/scalar] & 1 << fx) plotFontPixel(bufferNum, px-fx, py+fy, color, depth);
+			for (sint32 fx=0; fx<8*size; fx++)
+			{
+				for (sint32 fy=0; fy<16*size; fy++)
+				{
+					if (charBitmap[fy/size] & 1 << (fx/size)) plotFontPixel(bufferNum, px-fx, py+fy, color, depth);
 				}
 			}
 		}
@@ -1671,16 +1678,16 @@ void drawTextEx(sint32 bufferNum, sint32 x, sint32 y, uint32 color, char* str, b
 		{
 			if (clearPixels)
 			{
-				for (sint32 fy = 0; fy < 16; fy++)
+				for (sint32 fx=0; fx<8*size; fx++)
 				{
-					for (sint32 fx = 0; fx < 8; fx++)
+					for (sint32 fy=0; fy<16*size; fy++)
 					{
-						plotFontPixel(bufferNum, px + fx, py + fy, 0, depth);
+						plotFontPixel(bufferNum, px+fx, py+fy, 0, depth);
 					}
 				}
 			}
 		}
-		px += 8;
+		px += 8*size;
 		str++;
 	}
 }
@@ -1710,7 +1717,7 @@ void drawHorizontalLineW2Ex(sint32 bufferNum, sint32 x, sint32 y, sint32 width, 
 }
 
 // change debug line
-void setDebugMessage(char str[256])
+void setDebugMessage(char* str)
 {
 	memset(debugMessage, 0, 256);
 	strcpy(debugMessage, str);

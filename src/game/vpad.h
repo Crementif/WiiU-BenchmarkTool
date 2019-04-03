@@ -58,3 +58,6 @@ typedef struct
     u8 volumeCalibrated;
     u8 __paddings__[7];
 } VPADData;
+
+int vpadError;
+VPADData vpadData;
