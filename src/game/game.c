@@ -174,8 +174,14 @@ void run_game()
 		if (currScreen == MAIN_MENU) drawMenu();
 		if (currScreen == GAMEPLAY_LOCAL || currScreen == GAMEPLAY_CLIENT || currScreen == GAMEPLAY_HOST) drawGame();
 		if (currScreen == OPTION_MENU) drawOptionMenu();
+		s64 ticksRequiredToHitTarget = MILLISECS_TO_TICKS(1000/targetFramerate)-/*Time to finish the frame*/(OSGetTime()-currTimestamp);
+		if (ticksRequiredToHitTarget < (s64)MILLISECS_TO_TICKS(4)) ticksRequiredToHitTarget = MILLISECS_TO_TICKS(4);
+		char ranCharBuffer[] = "SleepTicks:                      ";
+		//itoa(TICKS_TO_SECS(ticksRequiredToHitTarget), ranCharBuffer + 12, 10);
+		itoa(ticksRequiredToHitTarget, ranCharBuffer + 12, 10);
+		drawTextEx(0, 30, 30, 0xFF905000, ranCharBuffer, false, 2, 1);
 		finishFrame();
-		OSSleepTicks(MILLISECS_TO_TICKS(1000/targetFramerate)-/*Time to finish the frame*/(OSGetTime()-currTimestamp));
+		OSSleepTicks(ticksRequiredToHitTarget);
 	}
 	return;
 }
