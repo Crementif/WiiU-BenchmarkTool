@@ -8,50 +8,46 @@ int blockQueueLength = 0;
 obstacleType blockQueueType;
 obstacleType lastBlockType;
 
-void drawSprite(s8 bufferNum, u32 spritePtr[], int x, int y, int spriteHeight, int spriteWidth, int size) {
+void drawSprite(s8 bufferNum, u32 spritePtr[], int x, int y, int spriteWidth, int spriteHeight, int size) {
 	if (bufferNum < 0) {
 		drawSprite(0, spritePtr, x, y, spriteHeight, spriteWidth, size);
 		drawSprite(1, spritePtr, x, y, spriteHeight, spriteWidth, size);
 		return;
 	}
-	//if (x < 0 || (x + spriteWidth) >= 1280) return;
 	u32 *bufferPtr = bufferNum==0? frameBufferHexPtr : gamepadframeBufferHexPtr;
 	int bufferWidth = bufferNum==0? 1280 : 720;
-	for (int py=0; py<spriteHeight*size; py++) {
-		if (size == 1) {
-			//memcpy(bufferPtr+(x+((y+py)*bufferWidth)), spritePtr+(py*(spriteWidth-1)), spriteWidth); // Optimalize drawing by copying line by line
-		}
-		else {
-			for (int px=0; px<spriteWidth*size; px++) {
-				bufferPtr[(x+px)+((y+py)*bufferWidth)] = spritePtr[(px/size)+((py/size)*spriteWidth)];
-			}
+	for (int py = 0; py < spriteHeight*size; py++) {
+		for (int px = 0; px < spriteWidth*size; px++) {
+			if (x+px < 0 || x+px >= 1280) return;
+			bufferPtr[(x+px)+((y+py)*bufferWidth)] = spritePtr[(px/size)+((py/size)*spriteWidth)];
 		}
 	}
 }
 
-char *pointertouselessstuff = 0;
+void drawTiledSprite(int x, int y, u32 spritePtr[], int tiledBlockWidth, int tiledBlockHeight, int size) {
+	for (int px=0; px<tiledBlockWidth; px+=(size*16)) {
+		for (int py=0; py<tiledBlockHeight; py+=(size*18)) {
+			drawSprite(0, spritePtr, px+x-scrollPixelOffset, py+y, 16, 18, size);
+		}
+	}
+}
 
-void __attribute__((noinline)) drawSolidBlock(int gridX, int gridY, blockType blockDrawType) {
+void drawSolidBlock(int gridX, int gridY, u32 color) {
 	int startX = gridX-scrollPixelOffset;
 	if (startX < 0) startX = 0;
 	int endX = startX + BLOCK_PIXEL_WIDTH;
 	if (endX >= 1280) endX = 1280;
-	u32 color = ((blockDrawType == Air) ? 0xefefef00 : 0x38333300);
 	for (int y=0; y<BLOCK_PIXEL_HEIGHT; y++) {
 		for (int x=startX; x<endX; x++) {
 			frameBufferHexPtr[(x)+(y*1280+gridY*1280)] = color;
 		}
 	}
-	// Stuff to identify it in ida
-	static char stuff[] = "2200000000";
-	pointertouselessstuff = stuff;
-	//if (blockDrawType == Block) drawSprite(0, compressedtrash_block, 100, 100, 18, 16, 3);
 }
 
 void insertHighPlatform() {
 	for (int y=0; y<STAGE_HEIGHT; y++) {
 		if (y < 6) gridLayout[STAGE_WIDTH][y] = Air;
-		else gridLayout[STAGE_WIDTH][y] = Block;
+		else gridLayout[STAGE_WIDTH][y] = PotatoStarch;
 	}
 	if (blockQueueLength == 5) blockQueueLength = 0;
 }
@@ -59,7 +55,7 @@ void insertHighPlatform() {
 void insertLowPlatform() {
 	for (int y=0; y<STAGE_HEIGHT; y++) {
 		if (y < 8) gridLayout[STAGE_WIDTH][y] = Air;
-		else gridLayout[STAGE_WIDTH][y] = Block;
+		else gridLayout[STAGE_WIDTH][y] = Garbage;
 	}
 	if (blockQueueLength == 5) blockQueueLength = 0;
 }
@@ -67,7 +63,7 @@ void insertLowPlatform() {
 void insertGapPlatform() {
 	for (int y=0; y<STAGE_HEIGHT; y++) {
 		blockType newLine = Air;
-		if (blockQueueLength == 2 && blockQueueLength == 3) newLine = Block;
+		if (blockQueueLength == 2 && blockQueueLength == 3) newLine = Potato;
 		if (y < 8) gridLayout[STAGE_WIDTH][y] = Air;
 		else gridLayout[STAGE_WIDTH][y] = newLine;
 	}
@@ -104,10 +100,22 @@ void drawGrid() {
 		for (int y=0; y<STAGE_HEIGHT; y++) {
 			switch(gridLayout[x][y]) {
 				case Block:
-					drawSolidBlock(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, gridLayout[x][y]);
+					drawSolidBlock(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, 0x38333300);
+					break;
+				case Garbage:
+					drawTiledSprite(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, compressedtrash_block, BLOCK_PIXEL_WIDTH, BLOCK_PIXEL_HEIGHT, 3);
+					break;
+				case Potato:
+					drawTiledSprite(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, potato_block, BLOCK_PIXEL_WIDTH, BLOCK_PIXEL_HEIGHT, 2);
+					break;
+				case PotatoStarch:
+					drawTiledSprite(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, potatostarch_block, BLOCK_PIXEL_WIDTH, BLOCK_PIXEL_HEIGHT, 1);
+					break;
+				case Air:
+					drawSolidBlock(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, 0x314a7200);
 					break;
 				default:
-					drawSolidBlock(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, gridLayout[x][y]);
+					drawSolidBlock(BLOCK_PIXEL_WIDTH*x, BLOCK_PIXEL_HEIGHT*y, 0xff005900);
 					break;
 			}
 		}

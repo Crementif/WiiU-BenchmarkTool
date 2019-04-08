@@ -19,8 +19,10 @@
 
 typedef enum {
 	Air,
-	Block,
+	Garbage,
 	Potato,
+	PotatoStarch,
+	Block,
 	Platform
 } blockType;
 
@@ -107,7 +109,7 @@ void renderPlayer(VPADData* controller) {
 	
 	int lowestSurfacePos = BLOCK_PIXEL_HEIGHT*STAGE_HEIGHT;
 	for (int y=0; y<STAGE_HEIGHT; y++) {
-		if (gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH][y] == Block || gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH+1][y] == Block) {
+		if (gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH][y] != Air || gridLayout[RUNNER_X_POS/BLOCK_PIXEL_WIDTH+1][y] != Air) {
 			// Calculate height from ground
 			lowestSurfacePos = BLOCK_PIXEL_HEIGHT*y;
 			break;
